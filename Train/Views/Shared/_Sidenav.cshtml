@@ -44,6 +44,13 @@
                             <i class="ni ni-circle-08 text-orange"></i> Employees
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link @(Context.Request.Path == "/managers" ? "active" : "")" href="@Url.Action("Index", "Managers")">
+                            <i class="ni ni-circle-08 text-orange"></i> Managers
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link @(Context.Request.Path == "/icons" ? "active" : "")" href="@Url.Action("Icons")">
                             <i class="ni ni-planet text-orange"></i> Icons
