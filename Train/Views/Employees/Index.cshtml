@@ -1,4 +1,4 @@
-﻿@model List<Train.ModelViews.EmployeeModelView>
+﻿@model List<Train.Models.Employee>
 <div class="row">
     <div class="col">
         <div class="card">
@@ -11,11 +11,8 @@
                 <table class="table align-items-center table-flush">
                     <thead class="thead-light">
                         <tr>
-                            <th scope="col" class="sort" data-sort="EmployeeId">EmployeeId</th>
-                            <th scope="col" class="sort" data-sort="FirstName">FirstName</th>
-                            <th scope="col" class="sort" data-sort="LastName">LastName</th>
-                            <th scope="col" class="sort" data-sort="DateOfBirth">DateOfBirth</th>
-                            <th scope="col" class="sort" data-sort="Salary">Salary</th>
+                            <th scope="col" class="sort" data-sort="Name">Name</th>
+                            <th scope="col" class="sort" data-sort="Email">Email</th>
                         </tr>
                     </thead>
                     <tbody class="list">
@@ -25,35 +22,14 @@
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.EmployeeId</span>
+                                            <span class="name mb-0 text-sm">@employee.Name</span>
                                         </div>
                                     </div>
                                 </th>
                                  <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.FirstName</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.LastName</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.DateOfBirth</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Salary</span>
+                                            <span class="name mb-0 text-sm">@employee.Email</span>
                                         </div>
                                     </div>
                                 </th>
@@ -90,6 +66,36 @@
                     </ul>
                 </nav>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="Create" asp-controller="Employees">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="example-text-input" class="form-control-label">Name</label>
+                    <input name="Name" class="form-control" type="text" value="..." id="example-text-input">
+                </div>
+                <div class="form-group">
+                    <label for="example-email-input" class="form-control-label">Email</label>
+                    <input name="Email" class="form-control" type="email" value="argon@example.com" id="example-email-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+            </form>
         </div>
     </div>
 </div>
