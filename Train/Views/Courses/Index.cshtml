@@ -1,4 +1,5 @@
 ﻿@model List<Train.Models.Course>
+@using Train.Enums
 <div class="row">
     <div class="col">
         <div class="card">
@@ -56,14 +57,34 @@
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Status</span>
+                                            @if (course.Status == ProgramStatus.Draft)
+                                            {
+                                                <span class="badge badge-default">@course.Status</span>
+                                            }
+                                            else if (course.Status == ProgramStatus.Sent)
+                                            {
+                                                <span class="badge badge-info">@course.Status</span>
+                                            }
+                                            else if (course.Status == ProgramStatus.Compelete)
+                                            {
+                                                <span class="badge badge-success">@course.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-default">@course.Status</span>
+                                            }
                                         </div>
+
                                     </div>
                                 </th>
                                 <th>
                                     <!-- Edit icon with link to show the Edit modal -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-toggle="modal" data-target="#editModal" data-id="@course.Id">
+                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-id="@course.Id">
                                         <i class="ni ni-ruler-pencil"></i> Edit
+                                    </a>
+                                    <!-- Push icon with link to Push action -->
+                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary push-link" data-id="@course.Id">
+                                        <i class="ni ni-send"></i> Push
                                     </a>
                                     <!-- Delete icon with link to Delete action -->
                                     <a href="#" class="btn btn-sm btn-icon btn-outline-danger delete-link" data-id="@course.Id">
@@ -141,11 +162,6 @@
                         <option>4</option>
                         <option>5</option>
                     </select>
-                   
-                   @* <div class="form-group">
-                        <label for="example-text-input" class="form-control-label">Status</label>
-                        <input name="Name" class="form-control" type="text" value="..." id="status">
-                    </div>*@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -203,8 +219,29 @@
         </div>
     </div>
 </div>
-
-
+<!-- Push Confirmation Modal -->
+<div class="modal fade" id="pushModal" tabindex="-1" role="dialog" aria-labelledby="pushModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pushModalLabel">Push Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="Push" asp-controller="Courses">
+                <input type="hidden" name="id" /> <!-- Hidden field for the Course ID -->
+                <div class="modal-body">
+                    <p>Are you sure you want to push this Course to managers?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Push</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -260,6 +297,17 @@
                         console.error("Error loading employee data");
                     }
                 });
+            });
+
+            // Handle click event on the "Push" link
+            $(".push-link").on("click", function (e) {
+                e.preventDefault();
+                var courseId = $(this).data("id");
+                // Set the course ID in the modal for reference
+                $("#pushModal input[name='id']").val(courseId);
+
+                // Show the modal
+                $("#pushModal").modal("show");
             });
 
             // Handle click event on the "Delete" link

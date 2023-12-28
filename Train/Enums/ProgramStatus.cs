@@ -2,6 +2,8 @@
 {
     public enum ProgramStatus
     {
-        Draft= 0,Approve=1,Compelete=2
+        Draft= 0,
+        Sent=1,
+        Compelete=2
     }
 }

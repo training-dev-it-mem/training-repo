@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
 using Train.Infrastructure;
 using Train.Infrastructure.ErrorHandling;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using Train.Services;
-using Train.ModelViews;
 
 namespace CreativeTim.Argon.DotNetCore.Free.Controllers
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Train.Data;
 using Train.Models;
-using Train.Services;
+using Train.ModelViews;
 
 namespace Train.Controllers
 {
@@ -13,11 +13,27 @@ namespace Train.Controllers
             _context = context;
         }
         [HttpGet("/employees")]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
-            var employees = _context.Employees.ToList();
-            return View(employees);
+            var totalCount = _context.Employees.Count(); // Get total number of records
+
+            var employees = _context.Employees
+                .OrderBy(e => e.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new EmployeeViewModel
+            {
+                Employees = employees,
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return View(viewModel);
         }
+
         [HttpPost]
         public IActionResult Create(Employee employee) {
             // logic

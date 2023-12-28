@@ -61,6 +61,21 @@ namespace Train.Controllers
             return RedirectToAction("Index");
         }
 
+        // POST: Courses/Push/5
+        [HttpPost]
+        public IActionResult Push(int id)
+        {
+            var course = _context.Programs.FirstOrDefault(e => e.Id == id);
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+            course.Status = Enums.ProgramStatus.Sent;
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
         // POST: Courses/Delete/5
         [HttpPost]
         public IActionResult Delete(int id)
