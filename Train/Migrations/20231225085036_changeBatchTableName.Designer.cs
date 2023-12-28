@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Train.Data;
 
@@ -11,9 +12,11 @@ using Train.Data;
 namespace Train.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231225085036_changeBatchTableName")]
+    partial class changeBatchTableName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,11 +256,11 @@ namespace Train.Migrations
 
             modelBuilder.Entity("Train.Models.Batch", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("number")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("number"));
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -271,7 +274,7 @@ namespace Train.Migrations
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
-                    b.HasKey("Id");
+                    b.HasKey("number");
 
                     b.ToTable("Batches");
                 });

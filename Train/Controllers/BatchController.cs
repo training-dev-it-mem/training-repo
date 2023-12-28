@@ -1,66 +1,63 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Train.Data;
 using Train.Models;
-using Train.Services;
 
 namespace Train.Controllers
 {
-    public class ManagersController : Controller
+  
+    public class BatchController : Controller
     {
-
-   
         private readonly ApplicationDbContext _context;
-        public ManagersController(ApplicationDbContext context)
+        public BatchController(ApplicationDbContext context)
         {
             _context = context;
-            
+
         }
-        [HttpGet("/managers")]
+        [HttpGet("/batch")]
         public IActionResult Index()
         {
-            var managers = _context.Managers.ToList();
-            return View(managers);
+            var batches = _context.Batches.ToList();
+            return View(batches);
 
-            
+
         }
         [HttpPost]
-        public IActionResult Create(Managers manager)
+        public IActionResult Create(Batch batch)
         {
             // logic
 
             // save to database
-            _context.Managers.Add(manager);
+            _context.Batches.Add(batch);
             _context.SaveChanges();
-            // return to list of employees
+            // return to list of batches
             return RedirectToAction("Index");
         }
-
         [HttpGet]
-        public IActionResult GetManagersById(int id)
+        public IActionResult GetBatchId(int id)
         {
             // Your edit logic here
-            var manager = _context.Managers.SingleOrDefault(x => x.Id == id);
-            if (manager == null)
-            {
-                return NotFound();
-            }
-            // Return the employee data as JSON
+            var batch = _context.Batches.SingleOrDefault(x => x.Id == id);
             return Json(new
             {
-                manager.Id,
-                manager.Name,
-                manager.Email,
+                batch.Id,
+                batch.StartDate,
+                batch.EndDate,
+                batch.StartTime,
+                batch.EndTime
+               
             });
         }
 
+
         [HttpPost]
-        public IActionResult Edit(Managers manager)
+        public IActionResult Edit(Batch batch)
         {
             // Your edit logic here
             // validate
 
             // update database 
-            _context.Update(manager);
+            _context.Update(batch);
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -71,6 +68,5 @@ namespace Train.Controllers
             return View();
         }
     }
+
 }
-
-

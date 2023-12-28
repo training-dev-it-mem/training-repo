@@ -1,76 +1,70 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Train.Data;
 using Train.Models;
-using Train.Services;
 
 namespace Train.Controllers
 {
-    public class ManagersController : Controller
+    
+    public class CoursesController : Controller
     {
-
-   
         private readonly ApplicationDbContext _context;
-        public ManagersController(ApplicationDbContext context)
+        public CoursesController(ApplicationDbContext context)
         {
             _context = context;
-            
+
         }
-        [HttpGet("/managers")]
+        [HttpGet("/courses")]
         public IActionResult Index()
         {
-            var managers = _context.Managers.ToList();
-            return View(managers);
+            var courses = _context.Programs.ToList();
+            return View(courses);
 
-            
+
         }
         [HttpPost]
-        public IActionResult Create(Managers manager)
+        public IActionResult Create(Course courses)
         {
             // logic
-
+            //courses.Status = Enums.ProgramStatus.Approve;
             // save to database
-            _context.Managers.Add(manager);
+            _context.Programs.Add(courses);
             _context.SaveChanges();
-            // return to list of employees
+            // return to list of Courses
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult GetManagersById(int id)
+        public IActionResult GetCoursesId(int id)
         {
             // Your edit logic here
-            var manager = _context.Managers.SingleOrDefault(x => x.Id == id);
-            if (manager == null)
-            {
-                return NotFound();
-            }
-            // Return the employee data as JSON
+            var course = _context.Programs.SingleOrDefault(x => x.Id == id);
             return Json(new
             {
-                manager.Id,
-                manager.Name,
-                manager.Email,
+                course.Id,
+                course.Name,
+                course.Description,
+                course.Location,
+                course.AdattionDate
             });
         }
 
+        
         [HttpPost]
-        public IActionResult Edit(Managers manager)
+        public IActionResult Edit(Course course)
         {
             // Your edit logic here
             // validate
 
             // update database 
-            _context.Update(manager);
+            _context.Update(course);
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
-
         public IActionResult Delete(int id)
         {
             // Your delete logic here
             return View();
         }
+
     }
 }
-
-

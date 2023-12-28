@@ -8,7 +8,7 @@
         <!-- Brand -->
         <div class="sidenav-header  align-items-center">
             <a class="navbar-brand" href="javascript:void(0)">
-                <img src="~/img/brand/blue.png" class="navbar-brand-img" alt="...">
+                <img src="~/img/brand/download (1).png" class="navbar-brand-img" alt="...">
             </a>
         </div>
         <div class="navbar-inner">
@@ -20,7 +20,7 @@
                     <div class="row">
                         <div class="col-6 collapse-brand">
                             <a href="/">
-                                <img src="~/img/brand/blue.png">
+                                <img src="~/img/brand/download(1).png">
                             </a>
                         </div>
                         <div class="col-6 collapse-close">
@@ -47,30 +47,27 @@
 
                     <li class="nav-item">
                         <a class="nav-link @(Context.Request.Path == "/managers" ? "active" : "")" href="@Url.Action("Index", "Managers")">
-                            <i class="ni ni-circle-08 text-orange"></i> Managers
+                            <i class="ni ni-badge text-red"></i> Managers
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/icons" ? "active" : "")" href="@Url.Action("Icons")">
-                            <i class="ni ni-planet text-orange"></i> Icons
+                        <a class="nav-link @(Context.Request.Path == "/courses" ? "active" : "")" href="@Url.Action("Index", "Courses")">
+                            <i class="ni ni-book-bookmark text-purple"></i> Courses
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/maps" ? "active" : "")" href="@Url.Action("Maps")">
-                            <i class="ni ni-pin-3 text-primary"></i> Google
+                        <a class="nav-link @(Context.Request.Path == "/batch" ? "active" : "")" href="@Url.Action("Index", "Batch")">
+                            <i class="ni ni-books text-yellow"></i> Batches
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/profile" ? "active" : "")" href="@Url.Action("Profile")">
-                            <i class="ni ni-single-02 text-yellow"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/tables" ? "active" : "")" href="@Url.Action("Tables")">
-                            <i class="ni ni-bullet-list-67 text-default"></i> Tables
-                        </a>
-                    </li>
+
+                   
+                    
+                       
+                   
+                    
                     
                     @* Not required for now *@
                     
@@ -85,12 +82,7 @@
                     @*     </a> *@
                     @* </li> *@
                     
-                    <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/upgrade" ? "active" : "")" href="@Url.Action("Upgrade")">
-                            <i class="ni ni-send text-dark"></i>
-                            <span class="nav-link-text">Upgrade</span>
-                        </a>
-                    </li>
+                    
                 </ul>
 
                 <!-- Divider -->

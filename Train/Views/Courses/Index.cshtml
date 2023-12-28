@@ -1,42 +1,67 @@
-﻿@model List<Train.Models.Employee>
+﻿@model List<Train.Models.Course>
 <div class="row">
     <div class="col">
         <div class="card">
             <!-- Card header -->
             <div class="card-header border-0">
-                <h3 class="mb-0">Emplyees table</h3>
+                <h3 class="mb-0">Programs Table</h3>
             </div>
             <!-- Light table -->
             <div class="table-responsive">
                 <table class="table align-items-center table-flush">
                     <thead class="thead-light">
                         <tr>
-                            <th scope="col" class="sort" data-sort="Name">Name</th>
-                            <th scope="col" class="sort" data-sort="Email">Email</th>
-                            <th>Actions</th>
+
+                            <th scope="col" class="sort" data-sort="name">Name</th>
+                            <th scope="col" class="sort" data-sort="Description">Description</th>
+                            <th scope="col" class="sort" data-sort="AdattionDate">AdattionDate</th>
+                            <th scope="col" class="sort" data-sort="Location">Location</th>
+                            <th scope="col" class="sort" data-sort="Status">Status</th>
                         </tr>
                     </thead>
                     <tbody class="list">
-                        @foreach (var employee in Model)
+                        @foreach (var course in Model)
                         {
                             <tr>
+
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Name</span>
+                                            <span class="name mb-0 text-sm">@course.Name</span>
                                         </div>
                                     </div>
                                 </th>
-                                 <th scope="row">
+                                <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Email</span>
+                                            <span class="name mb-0 text-sm">@course.Description</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@course.AdattionDate</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@course.Location</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@course.Status</span>
                                         </div>
                                     </div>
                                 </th>
                                 <th>
                                     <!-- Edit icon with link to show the Edit modal -->
-                                    <a href="#" class="btn btn-sm btn-neutral edit-link" data-toggle="modal" data-target="#editModal" data-id="@employee.Id">
+                                    <a href="#" class="btn btn-sm btn-neutral edit-link" data-toggle="modal" data-target="#editModal" data-id="@course.Id">
                                         <i class="ni ni-ruler-pencil"></i> Edit
                                     </a>
                                     |
@@ -50,6 +75,7 @@
                     </tbody>
                 </table>
             </div>
+
             <!-- Card footer -->
             <div class="card-footer py-4">
                 <nav aria-label="...">
@@ -82,7 +108,7 @@
     </div>
 </div>
 
-<!-- Create Modal -->
+<!-- Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -92,25 +118,44 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Create" asp-controller="Employees">
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Name</label>
-                    <input name="Name" class="form-control" type="text" value="..." id="name">
+            <form method="post" asp-action="Create" asp-controller="Courses">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="name" class="form-control-label">Name</label>
+                        <input name="Name" class="form-control" type="text" value="..." id="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="form-control-label">Descreption</label>
+                        <input name="Description" class="form-control" type="text" value="..." id="description">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionDate" class="form-control-label">Addition Date</label>
+                        <input class="form-control" type="date" value="2018-11-23" id="additionDate" name="AdattionDate">
+                    </div>
+                    <select name="Location" class="form-control">
+                        <option>Select Location</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                   
+                   @* <div class="form-group">
+                        <label for="example-text-input" class="form-control-label">Status</label>
+                        <input name="Name" class="form-control" type="text" value="..." id="status">
+                    </div>*@
                 </div>
-                <div class="form-group">
-                    <label for="example-email-input" class="form-control-label">Email</label>
-                    <input name="Email" class="form-control" type="email" value="argon@example.com" id="email">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Create</button>
-            </div>
+                </div>
             </form>
         </div>
     </div>
 </div>
+
 
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -122,7 +167,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Edit" asp-controller="Employees">
+            <form method="post" asp-action="Edit" asp-controller="Courses">
                 <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
 
                 <div class="modal-body">
@@ -131,9 +176,23 @@
                         <input for="Name" name="Name" class="form-control" />
                     </div>
                     <div class="form-group">
-                        <label for="Email" class="form-control-label">Email</label>
-                        <input for="Email" name="Email" class="form-control" />
+                        <label for="Description" class="form-control-label">Description</label>
+                        <input for="Description" name="Description" class="form-control" />
                     </div>
+          
+                    <div class="form-group">
+                        <label for="AdditionDate" class="form-control-label">AdditionDate</label>
+                        <input for="AdditionDate" name="AdattionDate" class="form-control" />
+                    </div>
+                    <select name="Location" class="form-control">
+                        <option>Select Location</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+
                     <!-- Add other form fields as needed -->
                 </div>
                 <div class="modal-footer">
@@ -151,18 +210,20 @@
             $(".edit-link").on("click", function (e) {
                 e.preventDefault();
 
-                var employeeId = $(this).data("id");
-                console.log("ID :" , employeeId);
+                var courseid= $(this).data("id");
+                console.log("ID :", courseid);
                 // Make an AJAX request to load the employee data
                 $.ajax({
-                    url: "/Employees/GetEmployeeById", // Replace with your actual action method
+                    url: "/Courses/GetCoursesId", // Replace with your actual action method
                     method: "GET",
-                    data: { id: employeeId },
-                    success: function (employee) {
+                    data: { id: courseid },
+                    success: function (course) {
                         // Populate the modal with the employee data
-                        $("#editModal input[name='Id']").val(employee.id);
-                        $("#editModal input[name='Name']").val(employee.name);
-                        $("#editModal input[name='Email']").val(employee.email);
+                        $("#editModal input[name='Id']").val(course.id);
+                        $("#editModal input[name='Name']").val(course.name);
+                        $("#editModal input[name='Description']").val(course.description);
+                        $("#editModal input[name='AdattionDate']").val(course.adattionDate);
+                        $("#editModal select[name='Location']").val(course.location);
 
                         // Show the modal
                         $("#editModal").modal("show");

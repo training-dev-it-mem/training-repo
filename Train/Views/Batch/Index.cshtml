@@ -1,42 +1,62 @@
-﻿@model List<Train.Models.Employee>
+﻿@model List<Train.Models.Batch>
 <div class="row">
     <div class="col">
         <div class="card">
             <!-- Card header -->
             <div class="card-header border-0">
-                <h3 class="mb-0">Emplyees table</h3>
+                <h3 class="mb-0">Batch Table</h3>
             </div>
             <!-- Light table -->
             <div class="table-responsive">
                 <table class="table align-items-center table-flush">
                     <thead class="thead-light">
                         <tr>
-                            <th scope="col" class="sort" data-sort="Name">Name</th>
-                            <th scope="col" class="sort" data-sort="Email">Email</th>
-                            <th>Actions</th>
+                   
+                            <th scope="col" class="sort" data-sort="StartDate">StartDate</th>
+                            <th scope="col" class="sort" data-sort="EndDate">EndDate</th>
+                            <th scope="col" class="sort" data-sort="StartTime">StartTime</th>
+                            <th scope="col" class="sort" data-sort="EndtTime">EndTime</th>
+                            <th scope="col" class="sort" data-sort="Action">Action</th>
+                            
                         </tr>
+
                     </thead>
                     <tbody class="list">
-                        @foreach (var employee in Model)
+                        @foreach (var batch in Model)
                         {
                             <tr>
+                               
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Name</span>
+                                            <span class="name mb-0 text-sm">@batch.StartDate.ToString("dd/MM/yyyy")</span>
                                         </div>
                                     </div>
                                 </th>
-                                 <th scope="row">
+                                <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Email</span>
+                                            <span class="name mb-0 text-sm">@batch.EndDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@batch.StartTime</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@batch.EndTime</span>
                                         </div>
                                     </div>
                                 </th>
                                 <th>
                                     <!-- Edit icon with link to show the Edit modal -->
-                                    <a href="#" class="btn btn-sm btn-neutral edit-link" data-toggle="modal" data-target="#editModal" data-id="@employee.Id">
+                                    <a href="#" class="btn btn-sm btn-neutral edit-link" data-toggle="modal" data-target="#editModal" data-id="@batch.Id">
                                         <i class="ni ni-ruler-pencil"></i> Edit
                                     </a>
                                     |
@@ -82,7 +102,7 @@
     </div>
 </div>
 
-<!-- Create Modal -->
+<!-- Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -92,26 +112,35 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Create" asp-controller="Employees">
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Name</label>
-                    <input name="Name" class="form-control" type="text" value="..." id="name">
+            <form method="post" asp-action="Create" asp-controller="Batch">
+                <div class="modal-body">
+                   
+                    <div class="form-group">
+                        <label for="startdate" class="form-control-label">StartDate</label>
+                        <input class="form-control" type="date" id="startdate" name="StartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="enddate" class="form-control-label">EndDate</label>
+                        <input class="form-control" type="date" value="2018-11-23" id="enddate" name="EndDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="starttime" class="form-control-label">StartTime</label>
+                        <input class="form-control" type="time" value="10:30:00" id="starttime" name="StartTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="endtime" class="form-control-label">EndTime</label>
+                        <input class="form-control" type="time" value="10:30:00" id="endtime" name="EndTime">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="example-email-input" class="form-control-label">Email</label>
-                    <input name="Email" class="form-control" type="email" value="argon@example.com" id="email">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Create</button>
-            </div>
+                </div>
             </form>
         </div>
     </div>
 </div>
-
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -122,18 +151,30 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Edit" asp-controller="Employees">
+            <form method="post" asp-action="Edit" asp-controller="Batch">
                 <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
 
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="Name" class="form-control-label">Name</label>
-                        <input for="Name" name="Name" class="form-control" />
+                        <label for="StartDate" class="form-control-label">Start Date</label>
+                        <input for="StartDate" name="StartDate" class="form-control" />
                     </div>
                     <div class="form-group">
-                        <label for="Email" class="form-control-label">Email</label>
-                        <input for="Email" name="Email" class="form-control" />
+                        <label for="EndDate" class="form-control-label">End Date</label>
+                        <input for="EndDate" name="EndDate" class="form-control" />
                     </div>
+
+                    <div class="form-group">
+                        <label for="StartTime" class="form-control-label">Start Time</label>
+                        <input for="StartTime" name="StartTime" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="EndTime" class="form-control-label">End Time</label>
+                        <input for="EndTime" name="EndTime" class="form-control" />
+                    </div>
+                    
+
                     <!-- Add other form fields as needed -->
                 </div>
                 <div class="modal-footer">
@@ -144,6 +185,7 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -151,18 +193,20 @@
             $(".edit-link").on("click", function (e) {
                 e.preventDefault();
 
-                var employeeId = $(this).data("id");
-                console.log("ID :" , employeeId);
+                var batchId = $(this).data("id");
+                console.log("ID :", batchId);
                 // Make an AJAX request to load the employee data
                 $.ajax({
-                    url: "/Employees/GetEmployeeById", // Replace with your actual action method
+                    url: "/Batch/GetBatchId", // Replace with your actual action method
                     method: "GET",
-                    data: { id: employeeId },
-                    success: function (employee) {
+                    data: { id: batchId },
+                    success: function (batch) {
                         // Populate the modal with the employee data
-                        $("#editModal input[name='Id']").val(employee.id);
-                        $("#editModal input[name='Name']").val(employee.name);
-                        $("#editModal input[name='Email']").val(employee.email);
+                        $("#editModal input[name='Id']").val(batch.id);
+                        $("#editModal input[name='StartDate']").val(batch.startDate);
+                        $("#editModal input[name='EndDate']").val(batch.endDate);
+                        $("#editModal input[name='StartTime']").val(batch.startTime);
+                        $("#editModal input[name='EndTime']").val(batch.endTime);
 
                         // Show the modal
                         $("#editModal").modal("show");
@@ -175,4 +219,3 @@
         });
     </script>
 }
-
