@@ -26,23 +26,10 @@ using Train.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-// Add services to the container.
-var config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
-    .AddJsonFile($"appsettings.{environment}.json", optional: true).Build();
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-
-//builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options =>
-//    options.SignIn.RequireConfirmedAccount=false)
-//    .AddEntityFrameworkStores<ApplicationDbContext>()
-//    .AddDefaultTokenProviders()
-//    .AddDefaultUI();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -101,28 +88,9 @@ builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Ap
     options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
 });
 
-/*builder.Services.AddDataProtection()
-               .PersistKeysToDbContext<ApplicationDbContext>();
- */
-builder.Services.AddAntiforgery();
-
 builder.Services.Configure<ScriptTags>(builder.Configuration.GetSection(nameof(ScriptTags)));
 
-
-builder.Services.AddControllersWithViews(options =>
-{
-// Slugify routes so that we can use /employee/employee-details/1 instead of
-// the default /Employee/EmployeeDetails/1
-//
-// Using an outbound parameter transformer is a better choice as it also allows
-// the creation of correct routes using view helpers
-options.Conventions.Add(
-    new RouteTokenTransformerConvention(
-        new SlugifyParameterTransformer()));
-
-// Enable Antiforgery feature by default on all controller actions
-options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-});
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddRazorPages(options =>
 {

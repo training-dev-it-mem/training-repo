@@ -52,11 +52,19 @@ namespace Train.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
-
+        // POST: Employees/Delete/5
+        [HttpPost]
         public IActionResult Delete(int id)
         {
-            // Your delete logic here
-            return View();
+            var employee = _context.Employees.FirstOrDefault(e => e.Id == id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            _context.Employees.Remove(employee);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }
