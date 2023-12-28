@@ -65,10 +65,19 @@ namespace Train.Controllers
             return RedirectToAction("Index");
         }
 
+        // POST: Manager/Delete/5
+        [HttpPost]
         public IActionResult Delete(int id)
         {
-            // Your delete logic here
-            return View();
+            var manager = _context.Managers.FirstOrDefault(e => e.Id == id);
+
+            if (manager == null)
+            {
+                return NotFound();
+            }
+            _context.Managers.Remove(manager);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }

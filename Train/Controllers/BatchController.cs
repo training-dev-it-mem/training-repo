@@ -62,10 +62,19 @@ namespace Train.Controllers
             return RedirectToAction("Index");
         }
 
+        // POST: Batch/Delete/5
+        [HttpPost]
         public IActionResult Delete(int id)
         {
-            // Your delete logic here
-            return View();
+            var batch = _context.Batches.FirstOrDefault(e => e.Id == id);
+
+            if (batch == null)
+            {
+                return NotFound();
+            }
+            _context.Batches.Remove(batch);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 

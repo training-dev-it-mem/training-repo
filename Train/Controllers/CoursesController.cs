@@ -60,11 +60,22 @@ namespace Train.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        // POST: Courses/Delete/5
+        [HttpPost]
         public IActionResult Delete(int id)
         {
-            // Your delete logic here
-            return View();
+            var course = _context.Programs.FirstOrDefault(e => e.Id == id);
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+            _context.Programs.Remove(course);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
+
 
     }
 }
