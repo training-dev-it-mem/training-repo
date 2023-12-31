@@ -1,79 +1,15 @@
-﻿@model EmployeeViewModel
+﻿
 <div class="row">
     <div class="col">
         <div class="card">
             <!-- Card header -->
-            <div class="card-header border-0">
-                <h3 class="mb-0">Emplyees table</h3>
+            <div class="row card-header border-0">
+                <h3 class="col-sm-4 mb-0">Emplyees table</h3>
+                <!-- Search form -->
+                <partial name="_SearchTable" />
             </div>
-            <!-- Light table -->
-            <div class="table-responsive">
-                <table class="table align-items-center table-flush" id="employee-table">
-                    <thead class="thead-light">
-                        <tr>
-                            <th scope="col" class="sort" data-sort="Name">Name</th>
-                            <th scope="col" class="sort" data-sort="Email">Email</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="list">
-                        @foreach (var employee in Model.Employees)
-                        {
-                            <tr>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Name</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                 <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Email</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th>
-                                    <!-- Edit icon with link to show the Edit modal -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-toggle="modal" data-target="#editModal" data-id="@employee.Id">
-                                        <i class="ni ni-ruler-pencil"></i> Edit
-                                    </a>
-                                    <!-- Delete icon with link to Delete action -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-danger delete-link" data-id="@employee.Id">
-                                        <i class="ni ni-basket"></i> Delete
-                                    </a>
-                                </th>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <!-- Table Pagination -->
-            <div class="card-footer py-4">
-                <nav aria-label="...">
-                    <ul class="pagination justify-content-end mb-0">
-                        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber - 1, pageSize = Model.PageSize })" tabindex="-1">
-                                <i class="ni ni-bold-left"></i>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </li>
-                        @for (int i = 1; i <= Model.TotalCount / Model.PageSize + 1; i++)
-                        {
-                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">@i</a>
-                            </li>
-                        }
-                        <li class="page-item @(Model.PageNumber == Model.TotalCount / Model.PageSize + 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber + 1, pageSize = Model.PageSize })">
-                                <i class="ni ni-bold-right"></i>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+          <!-- Employees Table -->
+            <partial name="_EmployeeTablePartial" />
         </div>
     </div>
 </div>
@@ -201,6 +137,25 @@
 
                 // Show the modal
                 $("#deleteModal").modal("show");
+            });
+            // Handle search event on search input
+            $(".search-input").on("input", function (e) {
+                // Handle search logic here
+                var inputValue = $(this).val();
+
+                // Make an AJAX request to the Search Action
+                $.ajax({
+                    url: "/Employees/Search",
+                    method: "GET",
+                    data: { query: inputValue },
+                    success: function (partialView) {
+                        // Update the table with the received HTML
+                        $("#employee-table").html(partialView);
+                    },
+                    error: function () {
+                        console.error("Error performing search");
+                    }
+                });
             });
         });
     </script>

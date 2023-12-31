@@ -82,5 +82,37 @@ namespace Train.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+        // Search action
+        public IActionResult Search(string query)
+        {
+            List<Employee> employees;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                // If the query is empty, return all employees
+                employees = _context.Employees.ToList();
+            }
+            else
+            {
+                // Perform the search based on the non-empty query
+                employees = _context.Employees
+                    .Where(e => e.Name.Contains(query) || e.Email.Contains(query))
+                    .ToList();
+            }
+
+            employees = employees.OrderBy(e => e.Name)
+                .Take(5)
+                .ToList();
+
+            var model = new EmployeeViewModel
+            {
+                Employees = employees,
+                TotalCount = employees.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_EmployeeTablePartial", model);
+        }
     }
 }
