@@ -35,16 +35,21 @@ namespace Train.Controllers
 
             return View(viewModel);
         }
-
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return PartialView();
+        }
         [HttpPost]
         public IActionResult Create(Employee employee) {
             // logic
-
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index", new {error = "Model not valid!"});
             // save to database
             _context.Employees.Add(employee);
             _context.SaveChanges();
             // return to list of employees
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "Employee created."});
         }
         [HttpGet]
         public IActionResult GetEmployeeById(int id)

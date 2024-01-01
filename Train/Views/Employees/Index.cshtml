@@ -15,31 +15,17 @@
 </div>
 
 <!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" data-url='@Url.Action("Create")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Create Form</h5>
+                <h5 class="modal-title" id="modal-title">Create Form</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Create" asp-controller="Employees">
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Name</label>
-                    <input name="Name" class="form-control" type="text" value="..." id="name">
-                </div>
-                <div class="form-group">
-                    <label for="example-email-input" class="form-control-label">Email</label>
-                    <input name="Email" class="form-control" type="email" value="argon@example.com" id="email">
-                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-            </form>
         </div>
     </div>
 </div>
@@ -132,11 +118,24 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Handle click event on the "Create" link
+            $(".create-link").on("click", function (e) {
+                var url = $("#createModal").data('url');
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    success: function (data) {
+                        console.log(data);
+                        $("#createModal .modal-body").html(data);
+                        $("#createModal").modal("show");
+                        $.validator.unobtrusive.parse($("#createForm"));
+                    }
+                });
+            });
             
             // Handle click event on the "Edit" link
             $(".edit-link").on("click", function (e) {
                 e.preventDefault();
-
                 var employeeId = $(this).data("id");
                 // Make an AJAX request to load the employee data
                 $.ajax({
@@ -189,7 +188,6 @@
                     }
                 });
             });
-
             // Handle filter event on "Filter" link
             $("#filterButton").on("click", function (e) {
                 var name = $("#filterModal input[name='Name']").val();

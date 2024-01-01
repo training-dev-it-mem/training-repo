@@ -22,7 +22,7 @@
                         @RenderSection("Breadcrumbs", required: false)
                         <div class="col-lg-6 col-5 text-right">
                             <!-- Link trigger modal -->
-                            <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#createModal">
+                            <a href="#" class="btn btn-sm btn-neutral create-link">
                                 New
                             </a>
                             <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#filterModal">Filters</a>
@@ -41,6 +41,8 @@
     </div>
 
     <partial name="_ThemeScripts" />
+    <!-- Add client validation script -->
+    <partial name="_ValidationScriptsPartial" />
 
     @RenderSection("Scripts", required: false)
 </body>
