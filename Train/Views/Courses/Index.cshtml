@@ -1,135 +1,20 @@
-﻿@model List<Train.Models.Course>
-@using Train.Enums
-<div class="row">
+﻿<div class="row">
     <div class="col">
         <div class="card">
             <!-- Card header -->
-            <div class="card-header border-0">
-                <h3 class="mb-0">Programs Table</h3>
+            <div class="row card-header border-0">
+                <h3 class="col-sm-4 mb-0">Course table</h3>
+                <!-- Search form -->
+                <partial name="_SearchTable" />
             </div>
-            <!-- Light table -->
-            <div class="table-responsive">
-                <table class="table align-items-center table-flush">
-                    <thead class="thead-light">
-                        <tr>
-
-                            <th scope="col" class="sort" data-sort="name">Name</th>
-                            <th scope="col" class="sort" data-sort="Description">Description</th>
-                            <th scope="col" class="sort" data-sort="AdattionDate">AdattionDate</th>
-                            <th scope="col" class="sort" data-sort="Location">Location</th>
-                            <th scope="col" class="sort" data-sort="Status">Status</th>
-                            <th scope="col" class="sort" data-sort="Action">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="list">
-                        @foreach (var course in Model)
-                        {
-                            <tr>
-
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Name</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Description</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.AdattionDate</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Location</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            @if (course.Status == ProgramStatus.Draft)
-                                            {
-                                                <span class="badge badge-default">@course.Status</span>
-                                            }
-                                            else if (course.Status == ProgramStatus.Sent)
-                                            {
-                                                <span class="badge badge-info">@course.Status</span>
-                                            }
-                                            else if (course.Status == ProgramStatus.Compelete)
-                                            {
-                                                <span class="badge badge-success">@course.Status</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-default">@course.Status</span>
-                                            }
-                                        </div>
-
-                                    </div>
-                                </th>
-                                <th>
-                                    <!-- Edit icon with link to show the Edit modal -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-id="@course.Id">
-                                        <i class="ni ni-ruler-pencil"></i> Edit
-                                    </a>
-                                    <!-- Push icon with link to Push action -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary push-link" data-id="@course.Id">
-                                        <i class="ni ni-send"></i> Push
-                                    </a>
-                                    <!-- Delete icon with link to Delete action -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-danger delete-link" data-id="@course.Id">
-                                        <i class="ni ni-basket"></i> Delete
-                                    </a>
-                                </th>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Card footer -->
-            <div class="card-footer py-4">
-                <nav aria-label="...">
-                    <ul class="pagination justify-content-end mb-0">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">
-                                <i class="fas fa-angle-left"></i>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">
-                                <i class="fas fa-angle-right"></i>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+            <!-- Course Table -->
+            <partial name="_CourseTablePartial" />
         </div>
     </div>
 </div>
+           
 
-<!-- Modal -->
+<!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -154,14 +39,9 @@
                         <label for="additionDate" class="form-control-label">Addition Date</label>
                         <input class="form-control" type="date" value="2018-11-23" id="additionDate" name="AdattionDate">
                     </div>
-                    <select name="Location" class="form-control">
-                        <option>Select Location</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
+                    <div class="form-group">
+                        <label for="Location" class="form-control-label">Location</label>
+                        <input name="Location" class="form-control" type="text" value="..." id="Location">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -200,15 +80,10 @@
                         <label for="AdditionDate" class="form-control-label">AdditionDate</label>
                         <input for="AdditionDate" name="AdattionDate" class="form-control" />
                     </div>
-                    <select name="Location" class="form-control">
-                        <option>Select Location</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
-
+                    <div class="form-group">
+                        <label for="Location" class="form-control-label">Location</label>
+                        <input for="Location" name="Location" class="form-control" />
+                    </div>
                     <!-- Add other form fields as needed -->
                 </div>
                 <div class="modal-footer">
@@ -319,6 +194,29 @@
 
                 // Show the modal
                 $("#deleteModal").modal("show");
+
+
+            });
+
+
+            // Handle search event on search input
+            $(".search-input").on("input", function (e) {
+                // Handle search logic here
+                var inputValue = $(this).val();
+
+                // Make an AJAX request to the Search Action
+                $.ajax({
+                    url: "/Courses/Search",
+                    method: "GET",
+                    data: { query: inputValue },
+                    success: function (partialView) {
+                        // Update the table with the received HTML
+                        $("#course-table").html(partialView);
+                    },
+                    error: function () {
+                        console.error("Error performing search");
+                    }
+                });
             });
 
         });

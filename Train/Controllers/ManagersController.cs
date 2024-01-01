@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Train.Data;
 using Train.Models;
+using Train.ModelViews;
 
 namespace Train.Controllers
 {
@@ -15,12 +16,27 @@ namespace Train.Controllers
             
         }
         [HttpGet("/managers")]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
-            var managers = _context.Managers.ToList();
-            return View(managers);
+            var totalCount = _context.Managers.Count(); // Get total number of records
 
-            
+            var manager = _context.Managers
+                .OrderBy(e => e.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new ManagerViewModel
+            {
+                Managers = manager,
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return View(viewModel);
+
+
         }
         [HttpPost]
         public IActionResult Create(Managers manager)
@@ -78,6 +94,41 @@ namespace Train.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        // Search action
+        public IActionResult Search(string query)
+        {
+            List<Managers> managers;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                // If the query is empty, return all employees
+                managers = _context.Managers.ToList();
+            }
+            else
+            {
+                // Perform the search based on the non-empty query
+                managers = _context.Managers
+                    .Where(e => e.Name.Contains(query) || e.Email.Contains(query))
+                    .ToList();
+            }
+
+            managers = managers.OrderBy(e => e.Name)
+                .Take(5)
+                .ToList();
+
+            var model = new ManagerViewModel
+            {
+                Managers = managers,
+                TotalCount = managers.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_ManagerTablePartial", model);
+        }
+
+
     }
 }
 

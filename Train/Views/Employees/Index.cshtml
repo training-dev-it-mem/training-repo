@@ -7,8 +7,10 @@
                 <h3 class="col-sm-4 mb-0">Emplyees table</h3>
                 <!-- Search form -->
                 <partial name="_SearchTable" />
+
+               
             </div>
-          <!-- Employees Table -->
+            <!-- Employees Table -->
             <partial name="_EmployeeTablePartial" />
         </div>
     </div>
@@ -43,6 +45,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -101,6 +104,41 @@
     </div>
 </div>
 
+
+<!-- filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">filter Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="Filter" asp-controller="Employees">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="example-text-input" class="form-control-label">Name</label>
+                        <input name="Name" class="form-control" type="text" value="..." id="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="example-email-input" class="form-control-label">Email</label>
+                        <input name="Email" class="form-control" type="email" value="argon@example.com" id="email">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="filterButton" type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -138,6 +176,9 @@
                 // Show the modal
                 $("#deleteModal").modal("show");
             });
+
+
+
             // Handle search event on search input
             $(".search-input").on("input", function (e) {
                 // Handle search logic here
@@ -150,6 +191,7 @@
                     data: { query: inputValue },
                     success: function (partialView) {
                         // Update the table with the received HTML
+                        
                         $("#employee-table").html(partialView);
                     },
                     error: function () {
@@ -157,6 +199,38 @@
                     }
                 });
             });
+
+
+            //Filter
+
+            function filterEmployees() {
+                var name = $('#nameInput').val(); // Assuming your input field for name has an ID 'nameInput'
+                var email = $('#emailInput').val(); // Assuming your input field for email has an ID 'emailInput'
+                $("#filterModal").modal("hide");
+                // AJAX call to the controller action
+               $.ajax({
+                    url: "/Employees/Filter",
+                    method: "GET",
+                    data: { name: name,
+                    email:email},
+                    success: function (partialView) {
+                        // Update the table with the received HTML
+                        console.log(partialView)
+                        $("#employee-table").html(partialView);
+                    },
+                    error: function () {
+                        console.error("Error performing search");
+                    }
+                });
+            }
+
+            // Event listener for triggering the filter on button click
+            $('#filterButton').click(function () {
+                filterEmployees(); // Call the filter function when the button is clicked
+            });
+
+
+
         });
     </script>
 }

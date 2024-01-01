@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Train.Data;
 using Train.Models;
+using Train.ModelViews;
+
 
 namespace Train.Controllers
 {
@@ -14,10 +16,25 @@ namespace Train.Controllers
 
         }
         [HttpGet("/courses")]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
-            var courses = _context.Programs.ToList();
-            return View(courses);
+            var totalCount = _context.Programs.Count(); // Get total number of records
+
+            var course = _context.Programs
+                .OrderBy(e => e.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new CourseViewModel
+            {
+                Courses = course,
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return View(viewModel);
 
 
         }
@@ -90,6 +107,42 @@ namespace Train.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+
+
+        // Search action
+        public IActionResult Search(string query)
+        {
+            List<Course> courses;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                // If the query is empty, return all employees
+                courses = _context.Programs.ToList();
+            }
+            else
+            {
+                // Perform the search based on the non-empty query
+                courses = _context.Programs
+                    .Where(e => e.Name.Contains(query) || e.AdattionDate.ToString().Contains(query) 
+                    || e.Description.Contains(query) || e.Location.Contains(query))
+                    .ToList();
+            }
+
+            courses = courses.OrderBy(e => e.Name)
+                .Take(5)
+                .ToList();
+
+            var model = new CourseViewModel
+            {
+                Courses = courses,
+                TotalCount = courses.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_CourseTablePartial", model);
+        }
+
 
 
     }

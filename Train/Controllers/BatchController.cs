@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Train.Data;
 using Train.Models;
+using Train.ModelViews;
+
 
 namespace Train.Controllers
 {
@@ -15,10 +17,25 @@ namespace Train.Controllers
 
         }
         [HttpGet("/batch")]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
-            var batches = _context.Batches.ToList();
-            return View(batches);
+            var totalCount = _context.Batches.Count(); // Get total number of records
+
+            var batch = _context.Batches
+                .OrderBy(e => e.StartDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new BatchViewModel
+            {
+                batches = batch,
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return View(viewModel);
 
 
         }
@@ -76,6 +93,43 @@ namespace Train.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        // Search action
+        public IActionResult Search(string query)
+        {
+            List<Batch> batches;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                // If the query is empty, return all employees
+                batches = _context.Batches.ToList();
+            }
+            else
+            {
+                
+                // Perform the search based on the non-empty query
+                batches = _context.Batches
+                    .Where(e => e.StartDate.ToString().Contains(query) || e.EndDate.ToString().Contains(query)||
+                    e.StartTime.ToString().Contains(query)||e.EndTime.ToString().Contains(query))
+                    .ToList();
+            }
+
+            batches = batches.OrderBy(e => e.StartDate)
+                .Take(5)
+                .ToList();
+
+            var model = new BatchViewModel
+            {
+                batches = batches,
+                TotalCount = batches.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_BatchTablePartial", model);
+        }
+
+
     }
 
 }
