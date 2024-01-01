@@ -3,6 +3,7 @@ using System.Linq;
 using Train.Data;
 using Train.Models;
 using Train.ModelViews;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Train.Controllers
 {
@@ -116,41 +117,34 @@ namespace Train.Controllers
             return PartialView("_EmployeeTablePartial", model);
         }
 
-
         //Filter
-
-        public IActionResult Filter(string name,string email)
+        public IActionResult Filter(string name, string email)
         {
-            List<Employee> employees;
+            IQueryable<Employee> employeesQuery = _context.Employees;
 
-            if (string.IsNullOrWhiteSpace(name)|| string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                // If the query is empty, return all employees
-                employees = _context.Employees.ToList();
-            }
-            else
-            {
-                employees = _context.Employees
-                    .Where(e => e.Name.Contains(name) &&
-                                e.Email.Contains(email))
-                    .ToList();
+                employeesQuery = employeesQuery.Where(emp => emp.Name.StartsWith(name));
             }
 
-            employees = employees.OrderBy(e => e.Name)
-                .Take(5)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                employeesQuery = employeesQuery.Where(emp => emp.Email.StartsWith(email));
+            }
+
+            var employees = employeesQuery.OrderBy(e => e.Name)
+                                           .Take(5)
+                                           .ToList();
 
             var model = new EmployeeViewModel
             {
                 Employees = employees,
-                TotalCount = employees.Count(),
+                TotalCount = employeesQuery.Count(),
                 PageSize = 5,
                 PageNumber = 1
             };
 
             return PartialView("_EmployeeTablePartial", model);
         }
-
-
     }
 }
