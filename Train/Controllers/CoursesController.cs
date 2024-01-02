@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Train.Data;
+using Train.Enums;
 using Train.Models;
 using Train.ModelViews;
 
@@ -143,7 +144,40 @@ namespace Train.Controllers
             return PartialView("_CourseTablePartial", model);
         }
 
+        //Filter
+        public IActionResult Filter(string name, string description, string location, ProgramStatus status)
+        {
+            List<Course> courses;
 
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) 
+                || string.IsNullOrWhiteSpace(location ))
+            {
+                // If the query is empty, return all employees
+                courses = _context.Programs.ToList();
+            }
+            else
+            {
+                courses = _context.Programs
+                    .Where(e => e.Name.Contains(name) &&
+                                e.Description.Contains(description)
+                                &&
+                                e.Location.Contains(location)).ToList();
+            }
+
+            courses = courses.OrderBy(e => e.Name)
+                .Take(5)
+                .ToList();
+
+            var model = new CourseViewModel
+            {
+                Courses = courses,
+                TotalCount = courses.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_CourseTablePartial", model);
+        }
 
     }
 }

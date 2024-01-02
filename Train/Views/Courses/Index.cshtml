@@ -42,10 +42,11 @@
                     <div class="form-group">
                         <label for="Location" class="form-control-label">Location</label>
                         <input name="Location" class="form-control" type="text" value="..." id="Location">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -141,6 +142,47 @@
     </div>
 </div>
 
+<!-- filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">filter Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="Filter" asp-controller="Courses">
+                <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="Name" class="form-control-label">Name</label>
+                        <input for="Name" name="Name" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Description" class="form-control-label">Description</label>
+                        <input for="Description" name="Description" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionDate" class="form-control-label">Addition Date</label>
+                        <input class="form-control" type="date" value="2018-11-23" id="additionDate" name="AdattionDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="Location" class="form-control-label">Location</label>
+                        <input for="Location" name="Location" class="form-control" />
+                    </div>
+                    <!-- Add other form fields as needed -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="filterButton" type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 @section Scripts {
@@ -218,6 +260,38 @@
                     }
                 });
             });
+
+            //Filter
+
+            function filterCourses() {
+                var name = $('#nameInput').val(); // Assuming your input field for name has an ID 'nameInput'
+                var description = $('#descriptionInput').val();
+                var location = $('#locationInput').val();// Assuming your input field for email has an ID 'emailInput'
+                $("#filterModal").modal("hide");
+                // AJAX call to the controller action
+                $.ajax({
+                    url: "/Courses/Filter",
+                    method: "GET",
+                    data: {
+                        name: name,
+                        description: description,
+                        location: location},
+                    success: function (partialView) {
+                        // Update the table with the received HTML
+                        console.log(partialView)
+                        $("#course-table").html(partialView);
+                    },
+                    error: function () {
+                        console.error("Error performing search");
+                    }
+                });
+            }
+            // Event listener for triggering the filter on button click
+            $('#filterButton').click(function () {
+                filterCourses(); // Call the filter function when the button is clicked
+            });
+
+
 
         });
     </script>

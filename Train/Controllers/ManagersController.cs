@@ -128,6 +128,39 @@ namespace Train.Controllers
             return PartialView("_ManagerTablePartial", model);
         }
 
+        //Filter
+        public IActionResult Filter(string name, string email)
+        {
+            List<Managers> managers;
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email))
+            {
+                // If the query is empty, return all employees
+                managers = _context.Managers.ToList();
+            }
+            else
+            {
+                managers = _context.Managers
+                    .Where(e => e.Name.Contains(name) &&
+                                e.Email.Contains(email))
+                    .ToList();
+            }
+
+            managers = managers.OrderBy(e => e.Name)
+                .Take(5)
+                .ToList();
+
+            var model = new ManagerViewModel
+            {
+                Managers = managers,
+                TotalCount = managers.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_ManagerTablePartial", model);
+        }
+
 
     }
 }

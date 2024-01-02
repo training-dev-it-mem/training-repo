@@ -129,6 +129,41 @@ namespace Train.Controllers
             return PartialView("_BatchTablePartial", model);
         }
 
+        //Filter
+        public IActionResult Filter(string name, string email)
+        {
+            List<Employee> employees;
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email))
+            {
+                // If the query is empty, return all employees
+                employees = _context.Employees.ToList();
+            }
+            else
+            {
+                employees = _context.Employees
+                    .Where(e => e.Name.Contains(name) &&
+                                e.Email.Contains(email))
+                    .ToList();
+            }
+
+            employees = employees.OrderBy(e => e.Name)
+                .Take(5)
+                .ToList();
+
+            var model = new EmployeeViewModel
+            {
+                Employees = employees,
+                TotalCount = employees.Count(),
+                PageSize = 5,
+                PageNumber = 1
+            };
+
+            return PartialView("_EmployeeTablePartial", model);
+        }
+
+
+
 
     }
 
