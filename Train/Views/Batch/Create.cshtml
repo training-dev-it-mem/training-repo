@@ -1,0 +1,35 @@
+﻿@model Batch
+
+<form asp-controller="Batch" asp-action="Create" method="post" id="createForm" onsubmit="onSubmit();">
+<div asp-validation-summary="ModelOnly">
+        <span class="text-danger">Please correct the following errors</span>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <label asp-for="StartDate" class="form-control-label"></label>
+            <input asp-for="StartDate" type="date" class="form-control" id="startdate" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EndDate" type="date" class="form-control-label"></label>
+        <input asp-for="EndDate" class="form-control" id="enddate" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+        <div class="form-group">
+            <label asp-for="StartTime" class="form-control-label"></label>
+            <input asp-for="StartTime"type="time" class="form-control" id="starttime" />
+            <span asp-validation-for="StartTime" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EndTime" class="form-control-label"></label>
+            <input asp-for="EndTime" type="time" class="form-control" id="endtime" />
+            <span asp-validation-for="EndTime" class="text-danger"></span>
+        </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <input type="submit" class="btn btn-primary" name="submit" />
+</div>
+</form>

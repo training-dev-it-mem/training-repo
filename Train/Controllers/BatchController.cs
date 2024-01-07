@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Train.Data;
 using Train.Models;
-using Train.ModelViews;
+using Train.ViewModels;
 
 
 namespace Train.Controllers
@@ -19,6 +19,24 @@ namespace Train.Controllers
         [HttpGet("/batch")]
         public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+
+
             var totalCount = _context.Batches.Count(); // Get total number of records
 
             var batch = _context.Batches
@@ -27,7 +45,7 @@ namespace Train.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            var viewModel = new BatchViewModel
+            var viewModel = new BatchsViewModel
             {
                 batches = batch,
                 PageNumber = page,
@@ -39,16 +57,25 @@ namespace Train.Controllers
 
 
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+
+            return PartialView();
+        }
+
         [HttpPost]
         public IActionResult Create(Batch batch)
         {
             // logic
-
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index", new { error = "Model not valid!" });
             // save to database
             _context.Batches.Add(batch);
             _context.SaveChanges();
             // return to list of batches
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "batch has been created." });
         }
         [HttpGet]
         public IActionResult GetBatchId(int id)
@@ -87,11 +114,11 @@ namespace Train.Controllers
 
             if (batch == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", new { error = "user not found." });
             }
             _context.Batches.Remove(batch);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "Batch has been deleted" });
         }
 
         // Search action
@@ -118,7 +145,7 @@ namespace Train.Controllers
                 .Take(5)
                 .ToList();
 
-            var model = new BatchViewModel
+            var model = new BatchsViewModel
             {
                 batches = batches,
                 TotalCount = batches.Count(),
@@ -130,36 +157,33 @@ namespace Train.Controllers
         }
 
         //Filter
-        public IActionResult Filter(string name, string email)
+        public IActionResult Filter(DateTime startdate, DateTime enddate)
         {
-            List<Employee> employees;
+            IQueryable<Batch> batchQuery = _context.Batches;
 
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email))
+            if (startdate != default(DateTime))
             {
-                // If the query is empty, return all employees
-                employees = _context.Employees.ToList();
-            }
-            else
-            {
-                employees = _context.Employees
-                    .Where(e => e.Name.Contains(name) &&
-                                e.Email.Contains(email))
-                    .ToList();
+                batchQuery = batchQuery.Where(btc => btc.StartDate >= startdate);
             }
 
-            employees = employees.OrderBy(e => e.Name)
-                .Take(5)
-                .ToList();
-
-            var model = new EmployeeViewModel
+            if (enddate != default(DateTime))
             {
-                Employees = employees,
-                TotalCount = employees.Count(),
+                batchQuery = batchQuery.Where(btc => btc.EndDate <= enddate);
+            }
+
+            var batches = batchQuery.OrderBy(e => e.StartDate)
+                                           .Take(5)
+                                           .ToList();
+
+            var model = new BatchsViewModel
+            {
+                batches = batches,
+                TotalCount = batchQuery.Count(),
                 PageSize = 5,
                 PageNumber = 1
             };
 
-            return PartialView("_EmployeeTablePartial", model);
+            return PartialView("_BatchTablePartial", model);
         }
 
 

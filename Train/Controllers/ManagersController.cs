@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Train.Data;
 using Train.Models;
-using Train.ModelViews;
+using Train.ViewModels;
 
 namespace Train.Controllers
 {
@@ -18,6 +18,23 @@ namespace Train.Controllers
         [HttpGet("/managers")]
         public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+
             var totalCount = _context.Managers.Count(); // Get total number of records
 
             var manager = _context.Managers
@@ -35,19 +52,23 @@ namespace Train.Controllers
             };
 
             return View(viewModel);
-
-
         }
+        public IActionResult Create()
+        {
+            return PartialView();
+        }
+
         [HttpPost]
-        public IActionResult Create(Managers manager)
+        public IActionResult Create(Managers managers)
         {
             // logic
-
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index", new { error = "Model not valid!" });
             // save to database
-            _context.Managers.Add(manager);
+            _context.Managers.Add(managers);
             _context.SaveChanges();
             // return to list of employees
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "Manager has been created." });
         }
 
         [HttpGet]
@@ -55,10 +76,6 @@ namespace Train.Controllers
         {
             // Your edit logic here
             var manager = _context.Managers.SingleOrDefault(x => x.Id == id);
-            if (manager == null)
-            {
-                return NotFound();
-            }
             // Return the employee data as JSON
             return Json(new
             {
@@ -88,11 +105,11 @@ namespace Train.Controllers
 
             if (manager == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", new { error = "user not found." });
             }
             _context.Managers.Remove(manager);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "Manager has been deleted" });
         }
 
         // Search action
@@ -131,29 +148,26 @@ namespace Train.Controllers
         //Filter
         public IActionResult Filter(string name, string email)
         {
-            List<Managers> managers;
+            IQueryable<Managers> managersQuery = _context.Managers;
 
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                // If the query is empty, return all employees
-                managers = _context.Managers.ToList();
-            }
-            else
-            {
-                managers = _context.Managers
-                    .Where(e => e.Name.Contains(name) &&
-                                e.Email.Contains(email))
-                    .ToList();
+                managersQuery = managersQuery.Where(mng => mng.Name.StartsWith(name));
             }
 
-            managers = managers.OrderBy(e => e.Name)
-                .Take(5)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                managersQuery = managersQuery.Where(mng => mng.Email.StartsWith(email));
+            }
+
+            var managers = managersQuery.OrderBy(e => e.Name)
+                                           .Take(5)
+                                           .ToList();
 
             var model = new ManagerViewModel
             {
                 Managers = managers,
-                TotalCount = managers.Count(),
+                TotalCount = managersQuery.Count(),
                 PageSize = 5,
                 PageNumber = 1
             };

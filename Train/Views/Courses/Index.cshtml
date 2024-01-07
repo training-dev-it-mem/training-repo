@@ -1,4 +1,9 @@
-﻿<div class="row">
+﻿@{
+    var status = Enum.GetValues(typeof(ProgramStatus))
+                         .Cast<ProgramStatus>()
+                         .ToList();
+}
+<div class="row">
     <div class="col">
         <div class="card">
             <!-- Card header -->
@@ -15,44 +20,20 @@
            
 
 <!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" data-url='@Url.Action("Create")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Create Form</h5>
+                <h5 class="modal-title" id="modal-title">Create New Course</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Create" asp-controller="Courses">
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <label for="name" class="form-control-label">Name</label>
-                        <input name="Name" class="form-control" type="text" value="..." id="name">
-                    </div>
-                    <div class="form-group">
-                        <label for="description" class="form-control-label">Descreption</label>
-                        <input name="Description" class="form-control" type="text" value="..." id="description">
-                    </div>
-                    <div class="form-group">
-                        <label for="additionDate" class="form-control-label">Addition Date</label>
-                        <input class="form-control" type="date" value="2018-11-23" id="additionDate" name="AdattionDate">
-                    </div>
-                    <div class="form-group">
-                        <label for="Location" class="form-control-label">Location</label>
-                        <input name="Location" class="form-control" type="text" value="..." id="Location">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create</button>
-                    </div>
-                </div>
-            </form>
+            <div class="modal-body">
+            </div>
         </div>
     </div>
 </div>
-
 
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -95,6 +76,7 @@
         </div>
     </div>
 </div>
+
 <!-- Push Confirmation Modal -->
 <div class="modal fade" id="pushModal" tabindex="-1" role="dialog" aria-labelledby="pushModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -118,6 +100,7 @@
         </div>
     </div>
 </div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -152,9 +135,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Filter" asp-controller="Courses">
                 <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
-
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="Name" class="form-control-label">Name</label>
@@ -173,13 +154,20 @@
                         <label for="Location" class="form-control-label">Location</label>
                         <input for="Location" name="Location" class="form-control" />
                     </div>
-                    <!-- Add other form fields as needed -->
+                <div class="form-group">
+                    <label for="Status" class="form-control-label">Status</label>
+                    <select name="selectedStatus" class="form-control">
+                        <option value="-1">Select Program Status</option>
+                        @foreach (var option in status)
+                        {
+                            <option value="@(option)">@option</option>
+                        }
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button id="filterButton" type="submit" class="btn btn-primary">Filter</button>
+                    <button id="filterButton" type="button" class="btn btn-primary">Filter</button>
                 </div>
-            </form>
         </div>
     </div>
 </div>
@@ -188,19 +176,36 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+
+                // Handle click event on the "Create" link
+                $(".create-link").on("click", function (e) {
+                    var url = $("#createModal").data('url');
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function (data) {
+                            console.log(data);
+                            $("#createModal .modal-body").html(data);
+                            $("#createModal").modal("show");
+                            $.validator.unobtrusive.parse($("#createForm"));
+                        }
+                    });
+                });
+
+
             // Handle click event on the "Edit" link
             $(".edit-link").on("click", function (e) {
                 e.preventDefault();
 
                 var courseid= $(this).data("id");
                 console.log("ID :", courseid);
-                // Make an AJAX request to load the employee data
+                // Make an AJAX request to load the course data
                 $.ajax({
                     url: "/Courses/GetCoursesId", // Replace with your actual action method
                     method: "GET",
                     data: { id: courseid },
                     success: function (course) {
-                        // Populate the modal with the employee data
+                        // Populate the modal with the course data
                         $("#editModal input[name='Id']").val(course.id);
                         $("#editModal input[name='Name']").val(course.name);
                         $("#editModal input[name='Description']").val(course.description);
@@ -261,35 +266,36 @@
                 });
             });
 
-            //Filter
+                // Handle filter event on "Filter" link
+                $("#filterButton").on("click", function (e) {
+                    var name = $("#filterModal input[name='Name']").val();
+                    var description = $("#filterModal input[name='Description']").val();
+                    var location = $("#filterModal input[name='Location']").val();
+                    var additionDate = $("#filterModal input[name='AdattionDate']").val();
+                    var status = $("#filterModal input[name='selectedStatus']").val();
 
-            function filterCourses() {
-                var name = $('#nameInput').val(); // Assuming your input field for name has an ID 'nameInput'
-                var description = $('#descriptionInput').val();
-                var location = $('#locationInput').val();// Assuming your input field for email has an ID 'emailInput'
-                $("#filterModal").modal("hide");
-                // AJAX call to the controller action
-                $.ajax({
-                    url: "/Courses/Filter",
-                    method: "GET",
-                    data: {
-                        name: name,
-                        description: description,
-                        location: location},
-                    success: function (partialView) {
-                        // Update the table with the received HTML
-                        console.log(partialView)
-                        $("#course-table").html(partialView);
-                    },
-                    error: function () {
-                        console.error("Error performing search");
-                    }
+                    $("#filterModal").modal("hide");
+
+                    // AJAX call to the controller action
+                    $.ajax({
+                        url: "/Courses/Filter",
+                        method: "GET",
+                        data: {
+                            name: name,
+                            description: description,
+                            location: location,
+                            additionDate: additionDate,
+                            status: status
+                        },
+                        success: function (partialView) {
+                            // Update the table with the received HTML
+                            $("#course-table").html(partialView);
+                        },
+                        error: function () {
+                            console.error("Error performing search");
+                        }
+                    });
                 });
-            }
-            // Event listener for triggering the filter on button click
-            $('#filterButton').click(function () {
-                filterCourses(); // Call the filter function when the button is clicked
-            });
 
 
 

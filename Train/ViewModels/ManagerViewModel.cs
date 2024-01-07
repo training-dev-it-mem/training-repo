@@ -1,6 +1,6 @@
 ﻿using Train.Models;
 
-namespace Train.ModelViews
+namespace Train.ViewModels
 {
     public class ManagerViewModel
     {

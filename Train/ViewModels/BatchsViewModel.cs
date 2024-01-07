@@ -2,9 +2,9 @@
 
 namespace Train.ViewModels
 {
-    public class CourseViewModel
+    public class BatchsViewModel
     {
-        public List<Courses> Courses { get; set; }
+        public List<Batch> batches { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }

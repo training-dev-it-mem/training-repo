@@ -1,10 +1,11 @@
-﻿using Train.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using Train.Models.Identity;
 
 namespace Train.ViewModels
 {
-    public class CourseViewModel
+    public class UsersViewModel
     {
-        public List<Courses> Courses { get; set; }
+        public List<ApplicationUser> Users { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }

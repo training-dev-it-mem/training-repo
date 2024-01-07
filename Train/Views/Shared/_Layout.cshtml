@@ -36,14 +36,27 @@
         <div class="container-fluid mt--6">
             <!-- Page content -->
             @RenderBody()
-            <partial name="_Footer" />
+          
         </div>
     </div>
 
     <partial name="_ThemeScripts" />
     <!-- Add client validation script -->
     <partial name="_ValidationScriptsPartial" />
-
+    @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+    {
+        <script>
+            // Display Toastr notification with the success message
+            toastr.success('@Html.Raw(ViewBag.SuccessMessage)');
+        </script>
+    }
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <script>
+            // Display Toastr notification with the success message
+            toastr.error('@Html.Raw(ViewBag.ErrorMessage)');
+        </script>
+    }
     @RenderSection("Scripts", required: false)
 </body>
 </html>

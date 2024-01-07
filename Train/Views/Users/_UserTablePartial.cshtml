@@ -1,40 +1,40 @@
-﻿@model EmployeesViewModel
+﻿@model UsersViewModel
 <!-- Light table -->
-<div id="employee-table">
+<div id="user-table">
     <div class="table-responsive">
         <table class="table align-items-center table-flush">
             <thead class="thead-light">
                 <tr>
-                    <th scope="col" class="sort" data-sort="Name">Name</th>
+                    <th scope="col" class="sort" data-sort="Name">Full Name</th>
                     <th scope="col" class="sort" data-sort="Email">Email</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody class="list">
-                @foreach (var employee in Model.Employees)
+                @foreach (var user in Model.Users)
                 {
                     <tr>
                         <th scope="row">
                             <div class="media align-items-center">
                                 <div class="media-body">
-                                    <span class="name mb-0 text-sm">@employee.Name</span>
+                                    <span class="name mb-0 text-sm">@user.FullName</span>
                                 </div>
                             </div>
                         </th>
                         <th scope="row">
                             <div class="media align-items-center">
                                 <div class="media-body">
-                                    <span class="name mb-0 text-sm">@employee.Email</span>
+                                    <span class="name mb-0 text-sm">@user.Email</span>
                                 </div>
                             </div>
                         </th>
                         <th>
                             <!-- Edit icon with link to show the Edit modal -->
-                            <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-toggle="modal" data-target="#editModal" data-id="@employee.Id">
+                            <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-toggle="modal" data-target="#editModal" data-id="@user.Id">
                                 <i class="ni ni-ruler-pencil"></i> Edit
                             </a>
                             <!-- Delete icon with link to Delete action -->
-                            <a href="#" class="btn btn-sm btn-icon btn-outline-danger delete-link" data-toggle="modal" data-target="#deleteModal" data-id="@employee.Id">
+                            <a href="#" class="btn btn-sm btn-icon btn-outline-danger delete-link" data-toggle="modal" data-target="#deleteModal" data-id="@user.Id">
                                 <i class="ni ni-basket"></i> Delete
                             </a>
                         </th>
@@ -43,6 +43,8 @@
             </tbody>
         </table>
     </div>
+
+
     <!-- Table Pagination -->
     <div class="card-footer py-4">
         <nav aria-label="...">

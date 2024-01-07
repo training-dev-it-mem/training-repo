@@ -2,7 +2,7 @@
 using System.Linq;
 using Train.Data;
 using Train.Models;
-using Train.ModelViews;
+using Train.ViewModels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Train.Controllers
@@ -17,6 +17,24 @@ namespace Train.Controllers
         [HttpGet("/employees")]
         public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+
+
             var totalCount = _context.Employees.Count(); // Get total number of records
 
             var employees = _context.Employees
@@ -25,7 +43,7 @@ namespace Train.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            var viewModel = new EmployeeViewModel
+            var viewModel = new EmployeesViewModel
             {
                 Employees = employees,
                 PageNumber = page,
@@ -38,13 +56,27 @@ namespace Train.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            // Assume you retrieve a list of managers from your data source
+            var managers = _context.Managers.ToList(); // Replace with your manager retrieval logic
+
+            // Populate ViewBag.Managers with the list of managers
+            ViewBag.Managers = managers;
+
             return PartialView();
         }
+
         [HttpPost]
-        public IActionResult Create(Employee employee) {
-            // logic
+        public IActionResult Create(EmployeeViewModel model) {
+
             if (!ModelState.IsValid)
                 return RedirectToAction("Index", new {error = "Model not valid!"});
+
+            var employee = new Employee
+            {
+                Name = model.Name,
+                Email = model.Email,
+                ManagerId = model.ManagerId
+            };
             // save to database
             _context.Employees.Add(employee);
             _context.SaveChanges();
@@ -83,11 +115,11 @@ namespace Train.Controllers
 
             if (employee == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", new { error = "user not found." });
             }
             _context.Employees.Remove(employee);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "Employee has been deleted" });
         }
         //Search action
         public IActionResult Search(string query)
@@ -111,7 +143,7 @@ namespace Train.Controllers
                 .Take(5)
                 .ToList();
 
-            var model = new EmployeeViewModel
+            var model = new EmployeesViewModel
             {
                 Employees = employees,
                 TotalCount = employees.Count(),
@@ -141,7 +173,7 @@ namespace Train.Controllers
                                            .Take(5)
                                            .ToList();
 
-            var model = new EmployeeViewModel
+            var model = new EmployeesViewModel
             {
                 Employees = employees,
                 TotalCount = employeesQuery.Count(),
@@ -151,5 +183,6 @@ namespace Train.Controllers
 
             return PartialView("_EmployeeTablePartial", model);
         }
+
     }
 }

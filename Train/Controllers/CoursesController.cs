@@ -2,7 +2,7 @@
 using Train.Data;
 using Train.Enums;
 using Train.Models;
-using Train.ModelViews;
+using Train.ViewModels;
 
 
 namespace Train.Controllers
@@ -19,6 +19,24 @@ namespace Train.Controllers
         [HttpGet("/courses")]
         public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+
+
             var totalCount = _context.Programs.Count(); // Get total number of records
 
             var course = _context.Programs
@@ -39,16 +57,24 @@ namespace Train.Controllers
 
 
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return PartialView();
+        }
+
         [HttpPost]
-        public IActionResult Create(Course courses)
+        public IActionResult Create(Courses courses)
         {
             // logic
-            //courses.Status = Enums.ProgramStatus.Approve;
+            if (!ModelState.IsValid)
+                return RedirectToAction("Index", new { error = "Model not valid!" });
             // save to database
             _context.Programs.Add(courses);
             _context.SaveChanges();
-            // return to list of Courses
-            return RedirectToAction("Index");
+            // return to list of courses
+            return RedirectToAction("Index", new { success = "Course is created." });
         }
 
         [HttpGet]
@@ -68,7 +94,7 @@ namespace Train.Controllers
 
         
         [HttpPost]
-        public IActionResult Edit(Course course)
+        public IActionResult Edit(Courses course)
         {
             // Your edit logic here
             // validate
@@ -102,18 +128,18 @@ namespace Train.Controllers
 
             if (course == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", new { error = "user not found." });
             }
             _context.Programs.Remove(course);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { success = "course has been deleted" });
         }
 
 
         // Search action
         public IActionResult Search(string query)
         {
-            List<Course> courses;
+            List<Courses> courses;
 
             if (string.IsNullOrWhiteSpace(query))
             {
@@ -124,8 +150,8 @@ namespace Train.Controllers
             {
                 // Perform the search based on the non-empty query
                 courses = _context.Programs
-                    .Where(e => e.Name.Contains(query) || e.AdattionDate.ToString().Contains(query) 
-                    || e.Description.Contains(query) || e.Location.Contains(query))
+                    .Where(e => e.Name.StartsWith(query) || e.AdattionDate.ToString().StartsWith(query) 
+                    || e.Description.StartsWith(query) || e.Location.StartsWith(query))
                     .ToList();
             }
 
@@ -147,7 +173,7 @@ namespace Train.Controllers
         //Filter
         public IActionResult Filter(string name, string description, string location, ProgramStatus status)
         {
-            List<Course> courses;
+            List<Courses> courses;
 
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) 
                 || string.IsNullOrWhiteSpace(location ))
@@ -158,10 +184,13 @@ namespace Train.Controllers
             else
             {
                 courses = _context.Programs
-                    .Where(e => e.Name.Contains(name) &&
-                                e.Description.Contains(description)
-                                &&
-                                e.Location.Contains(location)).ToList();
+                    .Where(e => e.Name.StartsWith(name) ||
+                                e.Description.StartsWith(description)
+                                ||
+                                e.Location.StartsWith(location)
+                              
+                                
+                                ).ToList();
             }
 
             courses = courses.OrderBy(e => e.Name)

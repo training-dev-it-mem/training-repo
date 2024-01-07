@@ -1,12 +1,23 @@
-﻿using Train.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using Train.Models;
 
-namespace Train.ModelViews
+namespace Train.ViewModels
 {
     public class BatchViewModel
     {
-        public List<Batch> batches { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int TotalCount { get; set; }
+        
+        public int Id { get; set; }
+        [DisplayFormat]
+        [DataType(DataType.Date)]
+        [Required]
+        public DateTime StartDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime EndDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+
+        [Required(ErrorMessage = "Please select Course")]
+        [Display(Name = "Course")]
+        public int CourseId { get; set; }
     }
 }

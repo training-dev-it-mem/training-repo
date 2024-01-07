@@ -3,17 +3,16 @@
         <div class="card">
             <!-- Card header -->
             <div class="row card-header border-0">
-                <h3 class="col-sm-4 mb-0">Batch table</h3>
+                <h3 class="col-sm-4 mb-0">Users table</h3>
                 <!-- Search form -->
                 <partial name="_SearchTable" />
             </div>
-            <!-- Course Table -->
-            <partial name="_BatchTablePartial" />
+            <!-- Users Table -->
+            <partial name="_UserTablePartial" />
         </div>
     </div>
 </div>
 
-            
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" data-url='@Url.Action("Create")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -30,8 +29,7 @@
     </div>
 </div>
 
-
-<!-- Modal for Edit Form -->
+<!-- Edit Model -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -41,30 +39,18 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Edit" asp-controller="Batch">
+            <form method="post" asp-action="Edit" asp-controller="Users">
                 <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
 
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="StartDate" class="form-control-label">Start Date</label>
-                        <input for="StartDate" name="StartDate" class="form-control" />
+                        <label for="FullName" class="form-control-label">Name</label>
+                        <input for="FullName" name="FullName" class="form-control" />
                     </div>
                     <div class="form-group">
-                        <label for="EndDate" class="form-control-label">End Date</label>
-                        <input for="EndDate" name="EndDate" class="form-control" />
+                        <label for="Email" class="form-control-label">Email</label>
+                        <input for="Email" name="Email" class="form-control" />
                     </div>
-
-                    <div class="form-group">
-                        <label for="StartTime" class="form-control-label">Start Time</label>
-                        <input for="StartTime" name="StartTime" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="EndTime" class="form-control-label">End Time</label>
-                        <input for="EndTime" name="EndTime" class="form-control" />
-                    </div>
-                    
-
                     <!-- Add other form fields as needed -->
                 </div>
                 <div class="modal-footer">
@@ -76,8 +62,8 @@
     </div>
 </div>
 
-
 <!-- Delete Confirmation Modal -->
+
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -87,20 +73,21 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Delete" asp-controller="Batch">
-                <input type="hidden" name="id" /> <!-- Hidden field for the Batch ID -->
+            <form method="post" asp-action="Delete" asp-controller="Users">
+                <input type="hidden" name="id" /> <!-- Hidden field for the employee ID -->
                 <div class="modal-body">
-                    <p>Are you sure you want to delete this Batch?</p>
+                    <p>Are you sure you want to delete this User?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </div>
+
             </form>
         </div>
     </div>
+    
 </div>
-
 
 <!-- Filter Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -112,30 +99,29 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="form-group">
-                <label for="startingdate" class="form-control-label">Starting Date</label>
-                <input class="form-control" type="date" value="2018-11-23" id="startingdate" name="StartDate">
-            </div>
-            <div class="form-group">
-                <label for="enddate" class="form-control-label">End Date</label>
-                <input class="form-control" type="date" value="2018-11-23" id="enddate" name="EndDate">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="example-text-input" class="form-control-label">Name</label>
+                    <input name="Name" class="form-control" type="text" >
+                </div>
+                <div class="form-group">
+                    <label for="example-email-input" class="form-control-label">Email</label>
+                    <input name="Email" class="form-control" type="email" >
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button id="filterButton" type="button" class="btn btn-primary">Filter</button>
             </div>
-            </div>
-            
-            </div>
         </div>
-    
+    </div>
+</div>
 
 
 
-@section Scripts {
+@section Scripts { 
     <script>
         $(document).ready(function () {
-
             // Handle click event on the "Create" link
             $(".create-link").on("click", function (e) {
                 var url = $("#createModal").data('url');
@@ -154,43 +140,40 @@
             // Handle click event on the "Edit" link
             $(".edit-link").on("click", function (e) {
                 e.preventDefault();
-
-                var batchId = $(this).data("id");
-                console.log("ID :", batchId);
+                var userId = $(this).data("id");
                 // Make an AJAX request to load the employee data
                 $.ajax({
-                    url: "/Batch/GetBatchId", // Replace with your actual action method
+                    url: "/Users/GetUserById", // Replace with your actual action method
                     method: "GET",
-                    data: { id: batchId },
-                    success: function (batch) {
+                    data: { id: userId },
+                    success: function (user) {
+                        console.log(user)
                         // Populate the modal with the employee data
-                        $("#editModal input[name='Id']").val(batch.id);
-                        $("#editModal input[name='StartDate']").val(batch.startDate);
-                        $("#editModal input[name='EndDate']").val(batch.endDate);
-                        $("#editModal input[name='StartTime']").val(batch.startTime);
-                        $("#editModal input[name='EndTime']").val(batch.endTime);
+                        $("#editModal input[name='Id']").val(user.id);
+                        $("#editModal input[name='FullName']").val(user.fullName);
+                        $("#editModal input[name='Email']").val(user.email);
 
                         // Show the modal
                         $("#editModal").modal("show");
                     },
                     error: function () {
-                        console.error("Error loading employee data");
+                        console.error("Error loading user data");
                     }
                 });
             });
 
-            // Handle click event on the "Delete" link
+            // Handle delete event on the "Edit" link
             $(".delete-link").on("click", function (e) {
                 e.preventDefault();
-                var batchId = $(this).data("id");
-                // Set the batch ID in the modal for reference
-                $("#deleteModal input[name='id']").val(batchId);
+
+                var userId = $(this).data("id");
+                // Set the user ID in the modal for reference
+                $("#deleteModal input[name='id']").val(userId)
 
                 // Show the modal
                 $("#deleteModal").modal("show");
             });
-
-
+            
             // Handle search event on search input
             $(".search-input").on("input", function (e) {
                 // Handle search logic here
@@ -198,12 +181,13 @@
 
                 // Make an AJAX request to the Search Action
                 $.ajax({
-                    url: "/Batch/Search",
+                    url: "/Users/Search",
                     method: "GET",
                     data: { query: inputValue },
                     success: function (partialView) {
                         // Update the table with the received HTML
-                        $("#batch-table").html(partialView);
+
+                        $("#user-table").html(partialView);
                     },
                     error: function () {
                         console.error("Error performing search");
@@ -211,33 +195,32 @@
                 });
             });
 
-
             // Handle filter event on "Filter" link
             $("#filterButton").on("click", function (e) {
-                var startDate = $("#filterModal input[name='StartDate']").val();
-                var endDate = $("#filterModal input[name='EndDate']").val();
+                console.log("Clicked")
+                var name = $("#filterModal input[name='Name']").val();
+                var email = $("#filterModal input[name='Email']").val();
 
                 $("#filterModal").modal("hide");
 
                 // AJAX call to the controller action
                 $.ajax({
-                    url: "/Batch/Filter",
+                    url: "/Users/Filter",
                     method: "GET",
                     data: {
-                        startDate: startDate,
-                        endDate: endDate
+                        fullName: name,
+                        email: email
                     },
                     success: function (partialView) {
+                        console.log("sucsees")
                         // Update the table with the received HTML
-                        $("#batch-table").html(partialView);
+                        $("#user-table").html(partialView);
                     },
                     error: function () {
                         console.error("Error performing search");
                     }
                 });
             });
-
-
         });
     </script>
 }

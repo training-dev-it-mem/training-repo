@@ -81,6 +81,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="submit" class="btn btn-danger">Delete</button>
+
             </div>
             </form>
         </div>
@@ -168,6 +169,8 @@
                 $("#deleteModal").modal("show");
             });
 
+
+
             // Handle search event on search input
             $(".search-input").on("input", function (e) {
                 // Handle search logic here
@@ -188,6 +191,8 @@
                     }
                 });
             });
+
+
             // Handle filter event on "Filter" link
             $("#filterButton").on("click", function (e) {
                 var name = $("#filterModal input[name='Name']").val();

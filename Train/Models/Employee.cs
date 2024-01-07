@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Train.Models
 {
@@ -6,9 +7,10 @@ namespace Train.Models
     {
         [Key]
         public int Id { get; set; }
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the name")]
         public string Name { get; set; }
-        [Required]
         public string Email { get; set; }
+        public int ManagerId { get; set; }
+        [ForeignKey("ManagerId")]
+        public Managers Manager { get; set; }
     }
 }

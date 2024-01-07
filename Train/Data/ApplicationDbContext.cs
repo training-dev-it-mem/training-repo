@@ -15,7 +15,7 @@ namespace Train.Data
         }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
-        public DbSet<Course> Programs { get; set; }
+        public DbSet<Courses> Programs { get; set; }
         public DbSet<Batch> Batches { get; set; }
         public DbSet<Managers> Managers { get; set; }
         public DbSet<Employee> Employees { get; set; }

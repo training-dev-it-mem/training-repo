@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Train.Data;
 
@@ -11,9 +12,11 @@ using Train.Data;
 namespace Train.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240107074945_AddFKManagerIdForEmployee")]
+    partial class AddFKManagerIdForEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -259,9 +262,6 @@ namespace Train.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -276,12 +276,10 @@ namespace Train.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
-
                     b.ToTable("Batches");
                 });
 
-            modelBuilder.Entity("Train.Models.Courses", b =>
+            modelBuilder.Entity("Train.Models.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -421,17 +419,6 @@ namespace Train.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Train.Models.Batch", b =>
-                {
-                    b.HasOne("Train.Models.Courses", "Course")
-                        .WithMany("Batches")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
             modelBuilder.Entity("Train.Models.Employee", b =>
                 {
                     b.HasOne("Train.Models.Managers", "Manager")
@@ -441,11 +428,6 @@ namespace Train.Migrations
                         .IsRequired();
 
                     b.Navigation("Manager");
-                });
-
-            modelBuilder.Entity("Train.Models.Courses", b =>
-                {
-                    b.Navigation("Batches");
                 });
 
             modelBuilder.Entity("Train.Models.Managers", b =>
