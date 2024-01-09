@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Train.Data;
 using Train.Models;
 using Train.ViewModels;
@@ -35,8 +36,6 @@ namespace Train.Controllers
                 // Save the value in ViewBag to pass it to the view
                 ViewBag.ErrorMessage = error;
             }
-
-
             var totalCount = _context.Batches.Count(); // Get total number of records
 
             var batch = _context.Batches
@@ -61,16 +60,30 @@ namespace Train.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            // Assume you retrieve a list of managers from your data source
+            var courses = _context.Programs.ToList(); // Replace with your Course retrieval logic
+
+            // Populate ViewBag.Managers with the list of managers
+            ViewBag.Programs = courses;
 
             return PartialView();
         }
 
         [HttpPost]
-        public IActionResult Create(Batch batch)
+        public IActionResult Create(BatchViewModel model)
         {
             // logic
             if (!ModelState.IsValid)
                 return RedirectToAction("Index", new { error = "Model not valid!" });
+
+            var batch = new Batch
+            {
+               StartDate= model.StartDate,
+               EndDate= model.EndDate,
+               StartTime= model.StartTime,
+               EndTime= model.EndTime,
+                CourseId = model.CourseId
+            };
             // save to database
             _context.Batches.Add(batch);
             _context.SaveChanges();

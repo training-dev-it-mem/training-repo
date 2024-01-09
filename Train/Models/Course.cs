@@ -23,7 +23,9 @@ namespace Train.Models
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the date")]
         public DateTime AdattionDate { get; set; }
+        public int Seats { get; set; }
 
         public ICollection<Batch> Batches { get; set; }
+        public string UserId { get; internal set; }
     }
 }

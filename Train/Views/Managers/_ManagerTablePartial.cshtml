@@ -1,4 +1,4 @@
-﻿@model ManagerViewModel
+﻿@model ManagersViewModel
 <!-- Light table -->
 <div id="manager-table">
     <div class="table-responsive">
@@ -7,6 +7,7 @@
                 <tr>
                     <th scope="col" class="sort" data-sort="Name">Name</th>
                     <th scope="col" class="sort" data-sort="Email">Email</th>
+                    <th scope="col" class="sort" data-sort="Department">Department</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -21,6 +22,7 @@
                                 </div>
                             </div>
                         </th>
+
                         <th scope="row">
                             <div class="media align-items-center">
                                 <div class="media-body">
@@ -28,6 +30,15 @@
                                 </div>
                             </div>
                         </th>
+
+                        <th scope="row">
+                            <div class="media align-items-center">
+                                <div class="media-body">
+                                    <span class="name mb-0 text-sm">@manager.Department</span>
+                                </div>
+                            </div>
+                        </th>
+
                         <th>
                             <!-- Edit icon with link to show the Edit modal -->
                             <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-toggle="modal" data-target="#editModal" data-id="@manager.Id">
@@ -43,6 +54,7 @@
             </tbody>
         </table>
     </div>
+
     <!-- Table Pagination -->
     <div class="card-footer py-4">
         <nav aria-label="...">

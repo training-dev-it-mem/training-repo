@@ -44,7 +44,7 @@ namespace Train.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            var viewModel = new ManagerViewModel
+            var viewModel = new ManagersViewModel
             {
                 Managers = manager,
                 PageNumber = page,
@@ -54,19 +54,28 @@ namespace Train.Controllers
 
             return View(viewModel);
         }
+        [HttpGet]
         public IActionResult Create()
         {
             return PartialView();
         }
 
         [HttpPost]
-        public IActionResult Create(Managers managers)
+        public IActionResult Create(ManagerViewModel model)
         {
-            // logic
+
+
             if (!ModelState.IsValid)
                 return RedirectToAction("Index", new { error = "Model not valid!" });
-            // save to database
-            _context.Managers.Add(managers);
+            var manager = new Managers
+            {
+                Name = model.Name,
+                Email = model.Email,
+                Department= model.Department,
+
+            };
+            //save to database
+            _context.Managers.Add(manager);
             _context.SaveChanges();
             // return to list of employees
             return RedirectToAction("Index", new { success = "Manager has been created." });
@@ -83,6 +92,7 @@ namespace Train.Controllers
                 manager.Id,
                 manager.Name,
                 manager.Email,
+                manager.Department
             });
         }
 
@@ -127,7 +137,7 @@ namespace Train.Controllers
             {
                 // Perform the search based on the non-empty query
                 managers = _context.Managers
-                    .Where(e => e.Name.Contains(query) || e.Email.Contains(query))
+                    .Where(e => e.Name.Contains(query) || e.Email.Contains(query) ||e.Department.ToString().Contains(query)) 
                     .ToList();
             }
 
@@ -135,7 +145,7 @@ namespace Train.Controllers
                 .Take(5)
                 .ToList();
 
-            var model = new ManagerViewModel
+            var model = new ManagersViewModel
             {
                 Managers = managers,
                 TotalCount = managers.Count(),
@@ -165,7 +175,7 @@ namespace Train.Controllers
                                            .Take(5)
                                            .ToList();
 
-            var model = new ManagerViewModel
+            var model = new ManagersViewModel
             {
                 Managers = managers,
                 TotalCount = managersQuery.Count(),

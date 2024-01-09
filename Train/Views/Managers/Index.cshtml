@@ -134,6 +134,7 @@
                         $("#createModal .modal-body").html(data);
                         $("#createModal").modal("show");
                         $.validator.unobtrusive.parse($("#createForm"));
+                        $('#departmentDropdown').select2();
                     }
                 });
             });

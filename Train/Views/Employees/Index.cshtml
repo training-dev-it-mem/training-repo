@@ -168,12 +168,13 @@
             });
 
 
+
             // Handle search event on search input
             $(".search-input").on("input", function (e) {
                 // Handle search logic here
                 var inputValue = $(this).val();
 
-                // Make an AJAX request to the Search Action
+            // Make an AJAX request to the Search Action
                 $.ajax({
                     url: "/Employees/Search",
                     method: "GET",
@@ -188,7 +189,6 @@
                     }
                 });
             });
-
 
             // Handle filter event on "Filter" link
             $("#filterButton").on("click", function (e) {

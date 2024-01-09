@@ -1,4 +1,4 @@
-﻿@model Courses
+﻿@model CourseViewModel
 @{
     var status = Enum.GetValues(typeof(ProgramStatus))
                          .Cast<ProgramStatus>()
@@ -46,6 +46,11 @@
             <input class="form-control" type="date" value="2018-11-23" id="additionDate" name="AdattionDate">
         </div>
 
+        <div class="form-group">
+            <label asp-for="Seats" class="form-control-label"></label>
+            <input asp-for="Seats" class="form-control" />
+            <span asp-validation-for="Seats" class="text-danger"></span>
+        </div>
 </div>
 
 <div class="modal-footer">

@@ -3,7 +3,8 @@ using Train.Data;
 using Train.Enums;
 using Train.Models;
 using Train.ViewModels;
-
+using Microsoft.AspNetCore.Identity;
+using Train.Models.Identity;
 
 namespace Train.Controllers
 {
@@ -11,9 +12,11 @@ namespace Train.Controllers
     public class CoursesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public CoursesController(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public CoursesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
 
         }
         [HttpGet("/courses")]
@@ -45,7 +48,7 @@ namespace Train.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            var viewModel = new CourseViewModel
+            var viewModel = new CoursesViewModel
             {
                 Courses = course,
                 PageNumber = page,
@@ -65,17 +68,42 @@ namespace Train.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Courses courses)
+        public async Task<IActionResult> Create(CourseViewModel model)
         {
-            // logic
             if (!ModelState.IsValid)
                 return RedirectToAction("Index", new { error = "Model not valid!" });
-            // save to database
-            _context.Programs.Add(courses);
-            _context.SaveChanges();
-            // return to list of courses
-            return RedirectToAction("Index", new { success = "Course is created." });
+
+            // Get the current logged-in user
+            ApplicationUser user = await _userManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+                var course = new Courses
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    AdattionDate = model.AdattionDate,
+                    Location = model.Location,
+                    Seats = model.Seats,
+                    Status = model.Status,
+                    UserId = user.Id
+                };
+
+                // save to database
+                _context.Programs.Add(course);
+                _context.SaveChanges();
+
+                // return to list of courses
+                return RedirectToAction("Index", new { success = "Course is created." });
+            }
+
+            // If user is null (not logged in), handle as needed
+            return RedirectToAction("Index", new { error = "User not found!" });
         }
+
+
+       
+
 
         [HttpGet]
         public IActionResult GetCoursesId(int id)
@@ -88,17 +116,27 @@ namespace Train.Controllers
                 course.Name,
                 course.Description,
                 course.Location,
-                course.AdattionDate
+                course.AdattionDate,
+                course.Seats
             });
         }
 
         
         [HttpPost]
-        public IActionResult Edit(Courses course)
+        public IActionResult Edit(CourseViewModel model)
         {
             // Your edit logic here
             // validate
+            var course = new Courses
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Location = model.Location,
+                Status= model.Status,
+                AdattionDate= model.AdattionDate,
+                //Seats = model.Seats,
 
+            };
             // update database 
             _context.Update(course);
             _context.SaveChanges();
@@ -159,7 +197,7 @@ namespace Train.Controllers
                 .Take(5)
                 .ToList();
 
-            var model = new CourseViewModel
+            var model = new CoursesViewModel
             {
                 Courses = courses,
                 TotalCount = courses.Count(),
@@ -197,7 +235,7 @@ namespace Train.Controllers
                 .Take(5)
                 .ToList();
 
-            var model = new CourseViewModel
+            var model = new CoursesViewModel
             {
                 Courses = courses,
                 TotalCount = courses.Count(),

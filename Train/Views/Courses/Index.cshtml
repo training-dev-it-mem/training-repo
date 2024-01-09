@@ -154,6 +154,11 @@
                         <label for="Location" class="form-control-label">Location</label>
                         <input for="Location" name="Location" class="form-control" />
                     </div>
+
+                <div class="form-group">
+                    <label for="Seats" class="form-control-label">Number of Seats</label>
+                    <input for="Seats" name="Seats" class="form-control" />
+                </div>
                 <div class="form-group">
                     <label for="Status" class="form-control-label">Status</label>
                     <select name="selectedStatus" class="form-control">
@@ -171,7 +176,7 @@
         </div>
     </div>
 </div>
-
+</div>
 
 @section Scripts {
     <script>
@@ -211,7 +216,7 @@
                         $("#editModal input[name='Description']").val(course.description);
                         $("#editModal input[name='AdattionDate']").val(course.adattionDate);
                         $("#editModal select[name='Location']").val(course.location);
-
+                        $("#editModal select[name='Seats']").val(course.seats);
                         // Show the modal
                         $("#editModal").modal("show");
                     },
@@ -273,7 +278,7 @@
                     var location = $("#filterModal input[name='Location']").val();
                     var additionDate = $("#filterModal input[name='AdattionDate']").val();
                     var status = $("#filterModal input[name='selectedStatus']").val();
-
+                    var status = $("#filterModal input[name='Seats']").val();
                     $("#filterModal").modal("hide");
 
                     // AJAX call to the controller action
@@ -285,7 +290,8 @@
                             description: description,
                             location: location,
                             additionDate: additionDate,
-                            status: status
+                            status: status,
+                            seats: seats
                         },
                         success: function (partialView) {
                             // Update the table with the received HTML

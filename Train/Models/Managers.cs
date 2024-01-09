@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Train.Enums;
 
 namespace Train.Models
 {
@@ -15,6 +16,8 @@ namespace Train.Models
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter email")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
+
+        public Department Department { get; set; }
 
         public ICollection<Employee> Employees { get; set; }
     }

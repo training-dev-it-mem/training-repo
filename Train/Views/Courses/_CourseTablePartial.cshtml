@@ -1,5 +1,5 @@
 ﻿@using Train.Enums;
-@model CourseViewModel
+@model CoursesViewModel
 <!-- Light table -->
 <div id="course-table"/>
     <div class="table-responsive">
@@ -13,7 +13,8 @@
                             <th scope="col" class="sort" data-sort="Description">Description</th>
                             <th scope="col" class="sort" data-sort="AdattionDate">Adattion Date</th>
                             <th scope="col" class="sort" data-sort="Location">Location</th>
-                            <th scope="col" class="sort" data-sort="Status">Status</th>
+                            <th scope="col" class="sort" data-sort="Seats">Seats</th>
+                            <th scope="col" class="sort" data-sort="Status">Status</th>                  
                             <th scope="col" class="sort" data-sort="Action">Action</th>
                         </tr>
                     </thead>
@@ -29,6 +30,7 @@
                                         </div>
                                     </div>
                                 </th>
+
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
@@ -36,6 +38,7 @@
                                         </div>
                                     </div>
                                 </th>
+
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
@@ -50,6 +53,14 @@
                                         </div>
                                     </div>
                                 </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@course.Seats</span>
+                                        </div>
+                                    </div>
+                                </th>
+
                                 <th scope="row">
                                     <div class="media align-items-center">
                                         <div class="media-body">
@@ -70,9 +81,11 @@
                                                 <span class="badge badge-default">@course.Status</span>
                                             }
                                         </div>
-
                                     </div>
                                 </th>
+
+                                 
+
                                 <th>
                                     <!-- Edit icon with link to show the Edit modal -->
                                     <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-id="@course.Id">
