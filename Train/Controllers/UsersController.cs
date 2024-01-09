@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Train.Data;
-using Train.Models;
 using Train.Models.Identity;
 using Train.ViewModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Train.Controllers
 {
@@ -104,6 +100,33 @@ namespace Train.Controllers
                 user.Email,
                
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string UserId)
+        {
+            //First Fetch the User Details by UserId
+            var user = await _userManager.FindByIdAsync(UserId);
+            //Check if User Exists in the Database
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"User with Id = {UserId} cannot be found";
+                return View("NotFound");
+            }
+            // GetClaimsAsync retunrs the list of user Claims
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            // GetRolesAsync returns the list of user Roles
+            var userRoles = await _userManager.GetRolesAsync(user);
+            //Store all the information in the EditUserViewModel instance
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                Claims = userClaims.Select(c => c.Value).ToList(),
+                Roles = userRoles
+            };
+            return PartialView("");
         }
 
         [HttpPost]

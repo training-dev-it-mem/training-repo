@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Train.Data;
 using Train.Models;
 using Train.ViewModels;
@@ -174,7 +175,16 @@ namespace Train.Controllers
 
             return PartialView("_ManagerTablePartial", model);
         }
+        // assgin employees
+        [HttpGet]
+        public IActionResult Assgin(int courseId)
+        {
+            // fetch courtse from db
+            var course = _context.Programs.Include(c=> c.Batches).Where(c=> c.Id == courseId).FirstOrDefault();
 
+
+            return View(course);
+        }
 
     }
 }

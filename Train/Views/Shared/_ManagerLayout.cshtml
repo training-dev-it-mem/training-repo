@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <partial name="_PageHeadElement" />
+    @RenderSection("Styles", required: false)
+    @RenderSection("HeadScripts", required: false)
+</head>
+<body>
+    <div class="main-content">
+        <partial name="Topnav/_Topnav" />
+        <!-- Header -->
+        <div class="header bg-primary pb-6">
+            <div class="container-fluid">
+                <div class="header-body">
+                    <!-- 1st Row: Crumbs and filters -->
+                    <div class="row align-items-center py-4">
+                        @RenderSection("Breadcrumbs", required: false)
+                        <div class="col-lg-6 col-5 text-right">
+                            <!-- Link trigger modal -->
+                            <a href="#" class="btn btn-sm btn-neutral create-link">
+                                New
+                            </a>
+                            <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#filterModal">Filters</a>
+                        </div>
+                    </div>
+                    @RenderSection("DashboardCards", required: false)
+                </div>
+            </div>
+        </div>
+        <!-- Page content -->
+        <div class="container-fluid mt--6">
+            <!-- Page content -->
+            @RenderBody()
+
+        </div>
+    </div>
+
+    <partial name="_ThemeScripts" />
+    <!-- Add client validation script -->
+    <partial name="_ValidationScriptsPartial" />
+    @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+    {
+        <script>
+            // Display Toastr notification with the success message
+            toastr.success('@Html.Raw(ViewBag.SuccessMessage)');
+        </script>
+    }
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <script>
+            // Display Toastr notification with the success message
+            toastr.error('@Html.Raw(ViewBag.ErrorMessage)');
+        </script>
+    }
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
