@@ -30,7 +30,7 @@
 </div>
 
 <!-- Edit Model -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" data-url='@Url.Action("Edit")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -39,25 +39,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Edit" asp-controller="Users">
-                <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
-
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="FullName" class="form-control-label">Name</label>
-                        <input for="FullName" name="FullName" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label for="Email" class="form-control-label">Email</label>
-                        <input for="Email" name="Email" class="form-control" />
-                    </div>
-                    <!-- Add other form fields as needed -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
+                <div class="modal-body"></div>
         </div>
     </div>
 </div>
@@ -117,8 +99,6 @@
     </div>
 </div>
 
-
-
 @section Scripts { 
     <script>
         $(document).ready(function () {
@@ -129,7 +109,6 @@
                     type: "GET",
                     url: url,
                     success: function (data) {
-                        console.log(data);
                         $("#createModal .modal-body").html(data);
                         $("#createModal").modal("show");
                         $.validator.unobtrusive.parse($("#createForm"));
@@ -139,22 +118,17 @@
 
             // Handle click event on the "Edit" link
             $(".edit-link").on("click", function (e) {
-                e.preventDefault();
+                var url = $("#editModal").data('url');
                 var userId = $(this).data("id");
                 // Make an AJAX request to load the employee data
                 $.ajax({
-                    url: "/Users/GetUserById", // Replace with your actual action method
-                    method: "GET",
+                    type: "GET",
+                    url: url, // Replace with your actual action method
                     data: { id: userId },
                     success: function (user) {
-                        console.log(user)
-                        // Populate the modal with the employee data
-                        $("#editModal input[name='Id']").val(user.id);
-                        $("#editModal input[name='FullName']").val(user.fullName);
-                        $("#editModal input[name='Email']").val(user.email);
-
-                        // Show the modal
+                        $("#editModal .modal-body").html(user);
                         $("#editModal").modal("show");
+                        $.validator.unobtrusive.parse($("#editForm"));
                     },
                     error: function () {
                         console.error("Error loading user data");
@@ -162,7 +136,7 @@
                 });
             });
 
-            // Handle delete event on the "Edit" link
+            // Handle delete event on the "Delete" link
             $(".delete-link").on("click", function (e) {
                 e.preventDefault();
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Train.Data;
 using Train.Models.Identity;
 using Train.ViewModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Train.Controllers
 {
@@ -61,7 +62,7 @@ namespace Train.Controllers
             return PartialView();
         }
         [HttpPost]
-        public async Task<IActionResult> Create(UserViewModel input)
+        public async Task<IActionResult> Create(UserViewModel model)
         {
             // logic
             if (!ModelState.IsValid)
@@ -71,21 +72,34 @@ namespace Train.Controllers
             {
                 var user = new ApplicationUser
                 {
-                    UserName = input.FullName,
-                    Email = input.Email,
-                    // Remove the code below to require the user to confirm their e-mail
+                    UserName = model.Email,
+                    Email = model.Email,
                     EmailConfirmed = true,
-                    // Custom fields next
-                    FullName = input.FullName,
+                    FullName = model.FullName,
                 };
-                var result = await _userManager.CreateAsync(user, input.Password);
+               
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", new { success = "User is created." });
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    // Serialize the errors into a string
+                    string serializedErrors = string.Join("; ", ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
 
-
-
+                    return RedirectToAction("Index", new { error = serializedErrors });
+                }
             }
            
             // return to list of users
-            return RedirectToAction("Index", new { success = "User is created." });
+            return RedirectToAction("Index", new { success = "User has been created." });
         }
         [HttpGet]
         public IActionResult GetUserById(string id)
@@ -103,14 +117,14 @@ namespace Train.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string UserId)
+        public async Task<IActionResult> Edit(string id)
         {
             //First Fetch the User Details by UserId
-            var user = await _userManager.FindByIdAsync(UserId);
+            var user = await _userManager.FindByIdAsync(id);
             //Check if User Exists in the Database
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"User with Id = {UserId} cannot be found";
+                ViewBag.ErrorMessage = $"User with Id = {id} cannot be found";
                 return View("NotFound");
             }
             // GetClaimsAsync retunrs the list of user Claims
@@ -121,26 +135,51 @@ namespace Train.Controllers
             var model = new EditUserViewModel
             {
                 Id = user.Id,
+                FullName = user.FullName,
                 Email = user.Email,
-                UserName = user.UserName,
                 Claims = userClaims.Select(c => c.Value).ToList(),
                 Roles = userRoles
             };
-            return PartialView("");
+            return PartialView("_Edit", model);
         }
 
         [HttpPost]
-        public IActionResult Edit(ApplicationUser user)
+        public async Task<IActionResult> Edit(EditUserViewModel model)
         {
-            // Your edit logic here
-            // validate
-            if(!ModelState.IsValid)
-                return RedirectToAction("Index", new { error = "model not valid." });
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null)
+            {
+                var error = $"User with Id = {model.Id} cannot be found.";
+                return RedirectToAction("Index", new { error });
+            }
+            else
+            {
+                //Populate the user instance with the data from EditUserViewModel
+                user.FullName = model.FullName;
+                user.Email = model.Email;
+                user.UserName = model.Email;
+                //UpdateAsync Method will update the user data in the AspNetUsers Identity table
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    //Once user data updated redirect to the ListUsers view
+                    return RedirectToAction("Index", new { success = "User has been updated." });
+                }
+                else
+                {
+                    //In case any error, stay in the same view and show the model validation error
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    // Serialize the errors into a string
+                    string serializedErrors = string.Join("; ", ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
 
-            // update database 
-            _context.Update(user);
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+                    return RedirectToAction("Index", new { error= serializedErrors });
+                }
+            }
         }
 
         // POST: Users/Delete/5
@@ -151,13 +190,12 @@ namespace Train.Controllers
 
             if (user == null)
             {
-                return RedirectToAction("Index", new { error = "user not found." });
+                return RedirectToAction("Index", new { error = "User not found." });
             }
             _context.Users.Remove(user);
             _context.SaveChanges();
-            return RedirectToAction("Index", new{success="user has been deleted" });
+            return RedirectToAction("Index", new{success="User has been deleted." });
         }
-
 
         //Search action
         public IActionResult Search(string query)
@@ -222,8 +260,6 @@ namespace Train.Controllers
             return PartialView("_UserTablePartial", model);
         }
 
-
-
     }
-    }
+}
 

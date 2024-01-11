@@ -11,13 +11,12 @@ namespace Train.ViewModels
             Claims = new List<string>();
             Roles = new List<string>();
         }
-
         [Required]
         public string Id { get; set; }
 
         [Required]
-        [Display(Name = "User Name")]
-        public string UserName { get; set; }
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; }
 
         [Required]
         [EmailAddress]
