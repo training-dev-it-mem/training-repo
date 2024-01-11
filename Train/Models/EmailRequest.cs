@@ -5,6 +5,6 @@ namespace Train.Models
     public class EmailRequest
     {
         public string ApiToken { get; set; }
-        public List<EmailMessage> Messages { get; set; }
+        public EmailMessage Message { get; set; }
     }
 }

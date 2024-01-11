@@ -7,6 +7,8 @@ using Train.Infrastructure.ApplicationUserClaims;
 using Train.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Train.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +22,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>()
-    
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
 builder.Services.Configure<IdentityOptions>(options =>
@@ -49,6 +49,7 @@ builder.Services.Configure<IdentityOptions>(options =>
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(4));
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "CreativeTim.Argon.DotNetCore.AppCookie";
@@ -120,7 +121,7 @@ options.Cookie.IsEssential = true;
 // This is required to make the application work behind a proxy like NGINX or HAPROXY
 // that also provides TLS termination (switching from incoming HTTPS to HTTP)
 builder.Services.AddHttpClient();
-
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 var app = builder.Build();
 app.UseForwardedHeaders();
     

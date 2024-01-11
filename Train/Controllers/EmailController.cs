@@ -26,21 +26,12 @@ namespace Train.Controllers
             var emailRequest = new EmailRequest
             {
                 ApiToken = apiToken,
-                Messages = new List<EmailMessage>
-            {
-                new EmailMessage
+                Message = new EmailMessage
                 {
                     To = "ahmed.s.alwahaibi@mem.gov.om",
                     Subject = "Test Subject 1",
                     Body = "Test Body 1"
-                },
-                  new EmailMessage
-                {
-                    To = "ahmed.s.alwahaibi@mem.gov.om",
-                    Subject = "Test Subject 2",
-                    Body = "Test Body 2"
                 }
-            }
             };
 
             try
