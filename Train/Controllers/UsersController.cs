@@ -11,7 +11,7 @@ namespace Train.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UsersController(ApplicationDbContext context,UserManager <ApplicationUser>userManager)
+        public UsersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -77,7 +77,7 @@ namespace Train.Controllers
                     EmailConfirmed = true,
                     FullName = model.FullName,
                 };
-               
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -97,7 +97,7 @@ namespace Train.Controllers
                     return RedirectToAction("Index", new { error = serializedErrors });
                 }
             }
-           
+
             // return to list of users
             return RedirectToAction("Index", new { success = "User has been created." });
         }
@@ -112,7 +112,7 @@ namespace Train.Controllers
                 user.Id,
                 user.FullName,
                 user.Email,
-               
+
             });
         }
 
@@ -177,7 +177,7 @@ namespace Train.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage));
 
-                    return RedirectToAction("Index", new { error= serializedErrors });
+                    return RedirectToAction("Index", new { error = serializedErrors });
                 }
             }
         }
@@ -194,7 +194,7 @@ namespace Train.Controllers
             }
             _context.Users.Remove(user);
             _context.SaveChanges();
-            return RedirectToAction("Index", new{success="User has been deleted." });
+            return RedirectToAction("Index", new { success = "User has been deleted." });
         }
 
         //Search action
@@ -260,6 +260,66 @@ namespace Train.Controllers
             return PartialView("_UserTablePartial", model);
         }
 
+        // Get: Users/ChangePassword
+        [HttpGet]
+        public IActionResult UpdatePassword()
+        {
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+
+            return View();
+        }
+        // Post: Users/UpdatePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    // Password changed successfully
+                    return RedirectToAction("UpdatePassword", new { success = "Password has been updated." });
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    string serializedErrors = string.Join("; ", ModelState.Values
+                       .SelectMany(v => v.Errors)
+                       .Select(e => e.ErrorMessage));
+
+                    // If ModelState is not valid, return the view with validation errors
+                    return RedirectToAction("UpdatePassword", new { error = serializedErrors });
+                }
+            }
+            return View(model);
+        }
     }
 }
 
