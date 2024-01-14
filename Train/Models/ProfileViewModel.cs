@@ -6,7 +6,7 @@ namespace Train.Models
     {
         [StringLength(100, ErrorMessage = "The {0} must be at max {1} characters long.")]
         [Display(Name = "Name")]
-        public string FullName { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [EmailAddress]

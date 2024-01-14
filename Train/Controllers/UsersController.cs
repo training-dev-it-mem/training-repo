@@ -39,7 +39,7 @@ namespace Train.Controllers
             var totalCount = _context.Users.Count(); // Get total number of records
 
             var users = _context.Users
-                .OrderBy(e => e.FullName)
+                .OrderBy(e => e.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -75,7 +75,7 @@ namespace Train.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     EmailConfirmed = true,
-                    FullName = model.FullName,
+                    Name = model.Name,
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -110,7 +110,7 @@ namespace Train.Controllers
             return Json(new
             {
                 user.Id,
-                user.FullName,
+                user.Name,
                 user.Email,
 
             });
@@ -135,7 +135,7 @@ namespace Train.Controllers
             var model = new EditUserViewModel
             {
                 Id = user.Id,
-                FullName = user.FullName,
+                FullName = user.Name,
                 Email = user.Email,
                 Claims = userClaims.Select(c => c.Value).ToList(),
                 Roles = userRoles
@@ -155,7 +155,7 @@ namespace Train.Controllers
             else
             {
                 //Populate the user instance with the data from EditUserViewModel
-                user.FullName = model.FullName;
+                user.Name = model.FullName;
                 user.Email = model.Email;
                 user.UserName = model.Email;
                 //UpdateAsync Method will update the user data in the AspNetUsers Identity table
@@ -211,11 +211,11 @@ namespace Train.Controllers
             {
                 // Perform the search based on the non-empty query
                 users = _context.Users
-                    .Where(e => e.FullName.Contains(query) || e.Email.Contains(query))
+                    .Where(e => e.Name.Contains(query) || e.Email.Contains(query))
                     .ToList();
             }
 
-            users = users.OrderBy(e => e.FullName)
+            users = users.OrderBy(e => e.Name)
                 .Take(5)
                 .ToList();
 
@@ -237,7 +237,7 @@ namespace Train.Controllers
 
             if (!string.IsNullOrWhiteSpace(fullName))
             {
-                usersQuery = usersQuery.Where(usr => usr.FullName.StartsWith(fullName));
+                usersQuery = usersQuery.Where(usr => usr.Name.StartsWith(fullName));
             }
 
             if (!string.IsNullOrWhiteSpace(email))
@@ -245,7 +245,7 @@ namespace Train.Controllers
                 usersQuery = usersQuery.Where(usr => usr.Email.StartsWith(email));
             }
 
-            var users = usersQuery.OrderBy(e => e.FullName)
+            var users = usersQuery.OrderBy(e => e.Name)
                                            .Take(5)
                                            .ToList();
 

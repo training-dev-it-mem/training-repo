@@ -21,10 +21,10 @@ namespace Train.Infrastructure.ApplicationUserClaims
         {
             var principal = await base.CreateAsync(user);
 
-            if (!string.IsNullOrWhiteSpace(user.FullName))
+            if (!string.IsNullOrWhiteSpace(user.Name))
             {
                 ((ClaimsIdentity)principal.Identity).AddClaims(new[] {
-                    new Claim("FullName", user.FullName)
+                    new Claim("Name", user.Name)
                 });
             }
 

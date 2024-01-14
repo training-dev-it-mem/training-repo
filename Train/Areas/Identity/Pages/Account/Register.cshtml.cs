@@ -42,7 +42,7 @@ namespace Train.Areas.Identity.Pages.Account
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
             [Display(Name = "Name")]
-            public string FullName { get; set; }
+            public string Name { get; set; }
 
             [Required]
             [EmailAddress]
@@ -86,7 +86,7 @@ namespace Train.Areas.Identity.Pages.Account
                     // Remove the code below to require the user to confirm their e-mail
                     EmailConfirmed = true,
                     // Custom fields next
-                    FullName = Input.FullName,
+                    Name = Input.Name,
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)

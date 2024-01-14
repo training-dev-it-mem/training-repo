@@ -48,7 +48,7 @@
                 </div>
                 <div class="text-center">
                     <h5 class="h3">
-                        @(Model.FullName != null ? Model.FullName : Model.Username)<span class="font-weight-light">, 27</span>
+                        @(Model.Name != null ? Model.Name : Model.Username)<span class="font-weight-light">, 27</span>
                     </h5>
                     <div class="h5 font-weight-300">
                         <i class="ni location_pin mr-2"></i>
@@ -131,7 +131,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-control-label" for="input-first-name">Full name</label>
-                                    <input asp-for="FullName" type="text" id="input-first-name" class="form-control" placeholder="First name">
+                                    <input asp-for="Name" type="text" id="input-first-name" class="form-control" placeholder="First name">
                                 </div>
                             </div>
                         </div>

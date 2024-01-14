@@ -63,7 +63,7 @@ namespace CreativeTim.Argon.DotNetCore.Free.Controllers
             {
                 Username = user.UserName,
                 Email = user.Email,
-                FullName = user.FullName
+                Name = user.Name
             });
         }
 
@@ -101,10 +101,10 @@ namespace CreativeTim.Argon.DotNetCore.Free.Controllers
             // so we need to check for that before proceeding
             if (ModelState.IsValid)
             {
-                if (input.FullName != user.FullName)
+                if (input.Name != user.Name)
                 {
                     // If we receive an empty string, set a null full name instead
-                    user.FullName = string.IsNullOrWhiteSpace(input.FullName) ? null : input.FullName;
+                    user.Name = string.IsNullOrWhiteSpace(input.Name) ? null : input.Name;
                 }
 
                 await _userManager.UpdateAsync(user);
