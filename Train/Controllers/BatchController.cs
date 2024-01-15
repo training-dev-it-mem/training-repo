@@ -61,7 +61,7 @@ namespace Train.Controllers
         public IActionResult Create()
         {
             // Assume you retrieve a list of managers from your data source
-            var courses = _context.Programs.ToList(); // Replace with your Course retrieval logic
+            var courses = _context.Courses.ToList(); // Replace with your Course retrieval logic
 
             // Populate ViewBag.Managers with the list of managers
             ViewBag.Programs = courses;
@@ -91,7 +91,7 @@ namespace Train.Controllers
             return RedirectToAction("Index", new { success = "batch has been created." });
         }
         [HttpGet]
-        public IActionResult GetBatchId(int id)
+        public IActionResult GetBatchId(Guid id)
         {
             // Your edit logic here
             var batch = _context.Batches.SingleOrDefault(x => x.Id == id);
@@ -121,7 +121,7 @@ namespace Train.Controllers
 
         // POST: Batch/Delete/5
         [HttpPost]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             var batch = _context.Batches.FirstOrDefault(e => e.Id == id);
 

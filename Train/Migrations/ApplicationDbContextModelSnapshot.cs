@@ -253,14 +253,12 @@ namespace Train.Migrations
 
             modelBuilder.Entity("Train.Models.Batch", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -281,13 +279,33 @@ namespace Train.Migrations
                     b.ToTable("Batches");
                 });
 
-            modelBuilder.Entity("Train.Models.Courses", b =>
+            modelBuilder.Entity("Train.Models.BatchEmployees", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EmployeeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("BatchEmployees");
+                });
+
+            modelBuilder.Entity("Train.Models.Course", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AdattionDate")
                         .HasColumnType("datetime2");
@@ -316,7 +334,7 @@ namespace Train.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Programs");
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("Train.Models.Department", b =>
@@ -331,7 +349,7 @@ namespace Train.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Department");
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("Train.Models.Identity.ApplicationUser", b =>
@@ -406,13 +424,32 @@ namespace Train.Migrations
 
             modelBuilder.Entity("Train.Models.Batch", b =>
                 {
-                    b.HasOne("Train.Models.Courses", "Course")
+                    b.HasOne("Train.Models.Course", "Course")
                         .WithMany("Batches")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("Train.Models.BatchEmployees", b =>
+                {
+                    b.HasOne("Train.Models.Batch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Train.Models.Identity.ApplicationUser", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Train.Models.Identity.ApplicationUser", b =>
@@ -426,7 +463,7 @@ namespace Train.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("Train.Models.Courses", b =>
+            modelBuilder.Entity("Train.Models.Course", b =>
                 {
                     b.Navigation("Batches");
                 });

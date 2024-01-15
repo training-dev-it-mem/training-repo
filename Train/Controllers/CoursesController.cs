@@ -40,9 +40,9 @@ namespace Train.Controllers
             }
 
 
-            var totalCount = _context.Programs.Count(); // Get total number of records
+            var totalCount = _context.Courses.Count(); // Get total number of records
 
-            var course = _context.Programs
+            var course = _context.Courses
                 .OrderBy(e => e.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -78,7 +78,7 @@ namespace Train.Controllers
 
             if (user != null)
             {
-                var course = new Courses
+                var course = new Course
                 {
                     Name = model.Name,
                     Description = model.Description,
@@ -90,7 +90,7 @@ namespace Train.Controllers
                 };
 
                 // save to database
-                _context.Programs.Add(course);
+                _context.Courses.Add(course);
                 _context.SaveChanges();
 
                 // return to list of courses
@@ -106,10 +106,10 @@ namespace Train.Controllers
 
 
         [HttpGet]
-        public IActionResult GetCoursesId(int id)
+        public IActionResult GetCoursesId(Guid id)
         {
             // Your edit logic here
-            var course = _context.Programs.SingleOrDefault(x => x.Id == id);
+            var course = _context.Courses.SingleOrDefault(x => x.Id == id);
             return Json(new
             {
                 course.Id,
@@ -127,7 +127,7 @@ namespace Train.Controllers
         {
             // Your edit logic here
             // validate
-            var course = new Courses
+            var course = new Course
             {
                 Name = model.Name,
                 Description = model.Description,
@@ -145,9 +145,9 @@ namespace Train.Controllers
 
         // POST: Courses/Push/5
         [HttpPost]
-        public IActionResult Push(int id)
+        public IActionResult Push(Guid id)
         {
-            var course = _context.Programs.FirstOrDefault(e => e.Id == id);
+            var course = _context.Courses.FirstOrDefault(e => e.Id == id);
 
             if (course == null)
             {
@@ -160,15 +160,15 @@ namespace Train.Controllers
 
         // POST: Courses/Delete/5
         [HttpPost]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
-            var course = _context.Programs.FirstOrDefault(e => e.Id == id);
+            var course = _context.Courses.FirstOrDefault(e => e.Id == id);
 
             if (course == null)
             {
                 return RedirectToAction("Index", new { error = "user not found." });
             }
-            _context.Programs.Remove(course);
+            _context.Courses.Remove(course);
             _context.SaveChanges();
             return RedirectToAction("Index", new { success = "course has been deleted" });
         }
@@ -177,17 +177,17 @@ namespace Train.Controllers
         // Search action
         public IActionResult Search(string query)
         {
-            List<Courses> courses;
+            List<Course> courses;
 
             if (string.IsNullOrWhiteSpace(query))
             {
                 // If the query is empty, return all employees
-                courses = _context.Programs.ToList();
+                courses = _context.Courses.ToList();
             }
             else
             {
                 // Perform the search based on the non-empty query
-                courses = _context.Programs
+                courses = _context.Courses
                     .Where(e => e.Name.StartsWith(query) || e.AdattionDate.ToString().StartsWith(query) 
                     || e.Description.StartsWith(query) || e.Location.StartsWith(query))
                     .ToList();
@@ -211,17 +211,17 @@ namespace Train.Controllers
         //Filter
         public IActionResult Filter(string name, string description, string location, ProgramStatus status)
         {
-            List<Courses> courses;
+            List<Course> courses;
 
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) 
                 || string.IsNullOrWhiteSpace(location ))
             {
                 // If the query is empty, return all employees
-                courses = _context.Programs.ToList();
+                courses = _context.Courses.ToList();
             }
             else
             {
-                courses = _context.Programs
+                courses = _context.Courses
                     .Where(e => e.Name.StartsWith(name) ||
                                 e.Description.StartsWith(description)
                                 ||

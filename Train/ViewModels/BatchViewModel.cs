@@ -5,8 +5,7 @@ namespace Train.ViewModels
 {
     public class BatchViewModel
     {
-        
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [DisplayFormat]
         [DataType(DataType.Date)]
         [Required]
@@ -18,6 +17,6 @@ namespace Train.ViewModels
 
         [Required(ErrorMessage = "Please select Course")]
         [Display(Name = "Course")]
-        public int CourseId { get; set; }
+        public Guid CourseId { get; set; }
     }
 }

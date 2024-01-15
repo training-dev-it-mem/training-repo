@@ -6,7 +6,7 @@ namespace Train.ViewModels
 {
     public class CourseViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the name")]
         [MinLength(5, ErrorMessage = "The field must be at least 7 characters long.")]
@@ -25,6 +25,6 @@ namespace Train.ViewModels
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the date")]
         public DateTime AdattionDate { get; set; }
         public int Seats { get; set; }
-        public int UserId { get; set; }
+        public string CreatedBy { get; set; }
     }
 }
