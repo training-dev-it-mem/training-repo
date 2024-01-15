@@ -185,10 +185,26 @@
     <script>
         $(document).ready(function () {
 
-                // Handle click event on the "Create" link
-                $(".create-link").on("click", function (e) {
-                    var url = $("#createModal").data('url');
-                    $.ajax({
+            // Handle click event on the "Add" link
+            $(".assign-link").click(function (e) {
+                e.preventDefault();
+
+                var courseId = $(this).data("id");
+                var courseName = $(this).data("name");
+                var courseDescription = $(this).data("description");
+
+                // Update the content dynamically
+                $("#courseName").text(courseName);
+                $("#courseDescription").text(courseDescription);
+            });
+        });
+
+            // Handle click event on the "Create" link
+            $(".create-link").on("click", function (e) {
+                console.log("create link clicked");
+            var url = $("#createModal").data('url');
+                console.log(url);
+                $.ajax({
                         type: "GET",
                         url: url,
                         success: function (data) {
@@ -197,8 +213,8 @@
                             $("#createModal").modal("show");
                             $.validator.unobtrusive.parse($("#createForm"));
                         }
-                    });
                 });
+            });
 
 
             // Handle click event on the "Edit" link
@@ -228,6 +244,7 @@
                     }
                 });
             });
+
 
             // Handle click event on the "Push" link
             $(".push-link").on("click", function (e) {
@@ -274,7 +291,7 @@
                 });
             });
 
-                // Handle filter event on "Filter" link
+           // Handle filter event on "Filter" link
                 $("#filterButton").on("click", function (e) {
                     var name = $("#filterModal input[name='Name']").val();
                     var description = $("#filterModal input[name='Description']").val();

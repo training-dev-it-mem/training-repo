@@ -87,6 +87,11 @@
                                  
 
                                 <th>
+                                    <!-- Add icon with link to show the _ManagerLayout modal -->
+                            <a href="@Url.Action("Assign", "Managers", new { courseId = course.Id })" class="btn btn-sm btn-icon btn-outline-success assign-link" data-id="@course.Id">
+                                        <i class="ni ni-bullet-list-67"></i> Assign
+                                    </a>
+
                                     <!-- Edit icon with link to show the Edit modal -->
                                     <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-id="@course.Id">
                                         <i class="ni ni-ruler-pencil"></i> Edit

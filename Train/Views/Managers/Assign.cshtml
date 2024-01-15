@@ -1,0 +1,39 @@
+﻿@model Courses
+@{
+    Layout = "_ManagerLayout";
+}
+
+<div class="card">
+    <!-- Card header -->
+    <div class="row card-header border-0">
+        <h1>Assign Employees to Course</h1>
+    </div>
+
+   <div class="card-body">
+        <h3>Course Name: @Model.Name</h3>
+        <h4>Course Description: @Model.Description</h4>
+   </div>
+</div>
+@foreach (var batch in Model.Batches)
+{
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col" class="sort" data-sort="name">Name</th>
+                    <th scope="col" class="sort" data-sort="StartDate">StartDate</th>
+                    <th scope="col" class="sort" data-sort="EndDate">EndDate</th>
+                    <th scope="col" class="sort" data-sort="StartTime">StartTime</th>
+                    <th scope="col" class="sort" data-sort="EndtTime">EndTime</th>
+                    <th scope="col" class="sort" data-sort="Assign">Assign</th>
+                </tr>
+            </thead>
+
+
+
+        </table>
+    </div>
+}
+
+
+

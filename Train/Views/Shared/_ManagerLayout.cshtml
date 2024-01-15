@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html>
 <head>
     <partial name="_PageHeadElement" />
@@ -31,10 +32,6 @@
         <div class="container-fluid mt--6">
             <!-- Page content -->
             @RenderBody()
-
-        </div>
-    </div>
-
     <partial name="_ThemeScripts" />
     <!-- Add client validation script -->
     <partial name="_ValidationScriptsPartial" />
@@ -53,5 +50,6 @@
         </script>
     }
     @RenderSection("Scripts", required: false)
+    </div>
 </body>
 </html>
