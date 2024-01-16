@@ -115,6 +115,7 @@
                         $("#createModal .modal-body").html(data);
                         $("#createModal").modal("show");
                         $.validator.unobtrusive.parse($("#createForm"));
+                        $('#searchableDropdown').select2();
                     }
                 });
             });
@@ -197,6 +198,26 @@
                         console.error("Error performing search");
                     }
                 });
+            });
+
+            // Handle Search department menu
+            // Add event listener to detect when a user enters a value not in the menu
+            $('#searchableDropdown').on('select2:selecting', function (e) {
+                var selectedValue = e.params.args.data.id;
+
+                // Check if the selected value is the placeholder or an existing option
+                if (selectedValue === '' || $('#searchableDropdown option[value="' + selectedValue + '"]').length > 0) {
+                    // Value is either the placeholder or an existing option, hide the "Add" button
+                    $('#addDepartmentContainer').hide();
+                } else {
+                    // Value is not in the menu, show the "Add" button
+                    $('#addDepartmentContainer').show();
+                }
+            });
+            // Add event listener to handle the "Add" button click
+            $('#addDepartmentButton').on('click', function () {
+                // You can add your logic here to handle the "Add" button click
+                alert('Add new department logic goes here.');
             });
         });
     </script>

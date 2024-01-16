@@ -59,25 +59,35 @@ namespace Train.Controllers
             return View(viewModel);
         }
 
-
         [HttpGet]
         public IActionResult Create()
         {
-            // Retrieve the list of departments from your database or another source
             var departments = _context.Departments.ToList();
-            // Map the departments to SelectListItem for the dropdown list
             var departmentList = departments.Select(d => new SelectListItem
             {
                 Value = d.Id,
                 Text = d.Name
             }).ToList();
-            // Create the UserViewModel and set the DepartmentList
+
+            var roles = _context.Roles
+                            .Where(role => role.Name != "Admin")
+                            .ToList();
+
+            var rolesList = roles.Select(r => new SelectListItem
+            {
+                Value = r.Id,
+                Text = r.Name
+            }).ToList();
+
             var viewModel = new UserViewModel
             {
-                DepartmentList = departmentList
+                DepartmentList = departmentList,
+                RolesList = rolesList
             };
+
             return PartialView(viewModel);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel model)
         {

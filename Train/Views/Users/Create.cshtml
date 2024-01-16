@@ -15,17 +15,33 @@
         <input asp-for="Email" class="form-control" id="email" />
             <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-    <!-- Inside your view -->
-    <div class="form-group">
-        <label asp-for="DepartmentId" class="form-control-label"></label>
-        <select asp-for="DepartmentId" asp-items="@Model.DepartmentList" class="form-control">
-            <option value="">Select Department</option>
-        </select>
-        <span asp-validation-for="DepartmentId" class="text-danger"></span>
+        <div class="form-group">
+            <label asp-for="DepartmentId" class="form-control-label"></label>
+            <select asp-for="DepartmentId" asp-items="@Model.DepartmentList" class="form-control" id="searchableDropdown">
+                <option value="">Select Department</option>
+            </select>
+            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            <div id="addDepartmentContainer" style="display: none;">
+                <button type="button" class="btn btn-primary" id="addDepartmentButton">Add Department</button>
+            </div>
+        </div>
+       <label asp-for="Roles" class="form-control-label"></label>
+<div class="form-group">
+    @foreach (var role in Model.RolesList)
+    {
+        var roleId = $"chk{role.Value}";
+        <div class="form-check">
+            <input type="checkbox" name="Roles" value="@role.Value" id="@roleId" class="form-check-input" checked="@(Model.Roles != null && Model.Roles.Contains(role.Value))" />
+            <label class="form-check-label" for="@roleId">@role.Text</label>
+        </div>
+    }
+    <span asp-validation-for="Roles" class="text-danger"></span>
+</div>
+
     </div>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-    <input type="submit" class="btn btn-primary" name="submit" />
-</div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <input type="submit" class="btn btn-primary" name="submit" />
+    </div>
 </form>
