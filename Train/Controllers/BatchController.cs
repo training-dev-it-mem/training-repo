@@ -91,7 +91,7 @@ namespace Train.Controllers
             return RedirectToAction("Index", new { success = "batch has been created." });
         }
         [HttpGet]
-        public IActionResult GetBatchId(Guid id)
+        public IActionResult GetBatchId(string id)
         {
             // Your edit logic here
             var batch = _context.Batches.SingleOrDefault(x => x.Id == id);
@@ -121,7 +121,7 @@ namespace Train.Controllers
 
         // POST: Batch/Delete/5
         [HttpPost]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(string id)
         {
             var batch = _context.Batches.FirstOrDefault(e => e.Id == id);
 

@@ -106,7 +106,7 @@ namespace Train.Controllers
 
 
         [HttpGet]
-        public IActionResult GetCoursesId(Guid id)
+        public IActionResult GetCoursesId(string id)
         {
             // Your edit logic here
             var course = _context.Courses.SingleOrDefault(x => x.Id == id);
@@ -145,7 +145,7 @@ namespace Train.Controllers
 
         // POST: Courses/Push/5
         [HttpPost]
-        public IActionResult Push(Guid id)
+        public IActionResult Push(string id)
         {
             var course = _context.Courses.FirstOrDefault(e => e.Id == id);
 
@@ -160,7 +160,7 @@ namespace Train.Controllers
 
         // POST: Courses/Delete/5
         [HttpPost]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(string id)
         {
             var course = _context.Courses.FirstOrDefault(e => e.Id == id);
 

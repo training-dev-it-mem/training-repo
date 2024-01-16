@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Train.Data;
 using Train.Models.Identity;
 using Train.ViewModels;
@@ -11,12 +13,14 @@ namespace Train.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UsersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IEmailSender _emailSender;
+        public UsersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
-        [HttpGet("/user")]
+        [HttpGet("/users")]
         public IActionResult Index(int page = 1, int pageSize = 5)
         {
             if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
@@ -59,48 +63,68 @@ namespace Train.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return PartialView();
+            // Retrieve the list of departments from your database or another source
+            var departments = _context.Departments.ToList();
+            // Map the departments to SelectListItem for the dropdown list
+            var departmentList = departments.Select(d => new SelectListItem
+            {
+                Value = d.Id,
+                Text = d.Name
+            }).ToList();
+            // Create the UserViewModel and set the DepartmentList
+            var viewModel = new UserViewModel
+            {
+                DepartmentList = departmentList
+            };
+            return PartialView(viewModel);
         }
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel model)
         {
-            // logic
             if (!ModelState.IsValid)
-                return RedirectToAction("Index", new { error = "Model not valid!" });
-            // save to database
-            else if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    EmailConfirmed = true,
-                    Name = model.Name,
-                };
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index", new { success = "User is created." });
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Serialize the errors into a string
-                    string serializedErrors = string.Join("; ", ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage));
-
-                    return RedirectToAction("Index", new { error = serializedErrors });
-                }
+                return RedirectToAction("Index", new { error = "Model not valid!" });
             }
+            // Create the user without a password
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                EmailConfirmed = false, // Email is not yet confirmed
+                Name = model.Name,
+            };
+            var result = await _userManager.CreateAsync(user);
 
-            // return to list of users
-            return RedirectToAction("Index", new { success = "User has been created." });
+            if (result.Succeeded)
+            {
+                // Generate email confirmation token
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                // Construct the URL for the password setup page
+                var passwordSetupUrl = Url.Action("SetPassword", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+
+                // Send email to the user with the password setup link
+                await _emailSender.SendEmailAsync(user.Email, "Set Your Password",
+                    $"Please set your password by clicking <a href='{passwordSetupUrl}'>here</a>.");
+
+                return RedirectToAction("Index", new { success = "User has been created. Check your email to set your password." });
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                // Serialize the errors into a string
+                string serializedErrors = string.Join("; ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+
+                return RedirectToAction("Index", new { error = serializedErrors });
+            }
         }
+
         [HttpGet]
         public IActionResult GetUserById(string id)
         {
@@ -135,9 +159,8 @@ namespace Train.Controllers
             var model = new EditUserViewModel
             {
                 Id = user.Id,
-                FullName = user.Name,
+                Name = user.Name,
                 Email = user.Email,
-                Claims = userClaims.Select(c => c.Value).ToList(),
                 Roles = userRoles
             };
             return PartialView("_Edit", model);
@@ -155,7 +178,7 @@ namespace Train.Controllers
             else
             {
                 //Populate the user instance with the data from EditUserViewModel
-                user.Name = model.FullName;
+                user.Name = model.Name;
                 user.Email = model.Email;
                 user.UserName = model.Email;
                 //UpdateAsync Method will update the user data in the AspNetUsers Identity table

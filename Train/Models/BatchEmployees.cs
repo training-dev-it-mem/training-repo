@@ -5,8 +5,12 @@ namespace Train.Models
 {
     public class BatchEmployees
     {
-        public Guid Id { get; set; }
-        public Guid BatchId { get; set; }
+        public BatchEmployees()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
+        public string Id { get; set; }
+        public string BatchId { get; set; }
         [ForeignKey("BatchId")]
         public Batch Batch { get; set; }
         public string EmployeeId { get; set; }

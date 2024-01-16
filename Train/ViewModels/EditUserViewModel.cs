@@ -8,7 +8,6 @@ namespace Train.ViewModels
         //initialise Claims and Roles with a new list in the constructor.
         public EditUserViewModel()
         {
-            Claims = new List<string>();
             Roles = new List<string>();
         }
         [Required]
@@ -16,13 +15,11 @@ namespace Train.ViewModels
 
         [Required]
         [Display(Name = "Full Name")]
-        public string FullName { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
-        public List<string> Claims { get; set; }
 
         public IList<string> Roles { get; set; }
     }

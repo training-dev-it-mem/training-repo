@@ -123,6 +123,55 @@ options.Cookie.IsEssential = true;
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 var app = builder.Build();
+// Ensure the database is created and apply migrations
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+    var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+
+    // Apply any pending migrations
+    dbContext.Database.Migrate();
+
+    // Ensure the database is created (this doesn't apply migrations)
+    dbContext.Database.EnsureCreated();
+
+    // Check if the admin user exists, and create it if not
+    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var adminUser = await userManager.FindByNameAsync("admin");
+
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
+        {
+            Name = "Administrator",
+            UserName = "admin@mem.gov.om",
+            Email = "admin@mem.gov.om",
+            EmailConfirmed = true,
+        };
+
+        var result = await userManager.CreateAsync(adminUser, "Admin@123");
+
+        if (result.Succeeded)
+        {
+            // Add the admin role if needed
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var adminRoleExists = await roleManager.RoleExistsAsync("Admin");
+
+            if (!adminRoleExists)
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+        else
+        {
+            // Handle errors if user creation fails
+            var errors = result.Errors;
+            // Log or handle errors as needed
+        }
+    }
+}
 app.UseForwardedHeaders();
     
 if (app.Environment.IsDevelopment())

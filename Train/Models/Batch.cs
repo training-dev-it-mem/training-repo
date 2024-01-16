@@ -5,7 +5,11 @@ namespace Train.Models
 {
     public class Batch
     {
-        public Guid Id { get; set; }
+        public Batch()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
+        public string Id { get; set; }
         [DisplayFormat]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
@@ -14,7 +18,7 @@ namespace Train.Models
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
 
-        public Guid CourseId { get; set; }
+        public string CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course Course { get; set; }
     }

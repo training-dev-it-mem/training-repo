@@ -8,9 +8,8 @@ namespace Train.Models.Identity
     {
         [PersonalData]
         public string Name { get; set; }
-        public int? ManagerId { get; set; }
-        public Guid DepartmentId { get; set; }
-        [ForeignKey("DepartmentId")]
+        public string ManagerId { get; set; }
+        public string DepartmentId { get; set; }
         public Department Department { get; set; }
     }
 }

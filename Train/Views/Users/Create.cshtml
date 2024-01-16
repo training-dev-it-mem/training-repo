@@ -15,25 +15,14 @@
         <input asp-for="Email" class="form-control" id="email" />
             <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-
-        <div class="form-group">
-            <label asp-for="Password" class="form-control-label" ></label>
-            <input asp-for="Password" class="form-control" id="password" type="password" required />
-            <span asp-validation-for="Password" class="invalid-feedback" style="display: block"></span>
-        </div>
-
-
-        @*TO DO*@
-       @* <div class="text-muted font-italic">
-            <small>password strength: <span class="text-success font-weight-700">strong</span></small>
-        </div>*@
-
-        <div class="form-group">
-            <label asp-for="ConfirmPassword" class="form-control-label"></label>
-            <input asp-for="ConfirmPassword" class="form-control" id="conpassword" type="password" required />
-            <span asp-validation-for="ConfirmPassword" class="invalid-feedback" style="display: block"></span>
-        </div>
-
+    <!-- Inside your view -->
+    <div class="form-group">
+        <label asp-for="DepartmentId" class="form-control-label"></label>
+        <select asp-for="DepartmentId" asp-items="@Model.DepartmentList" class="form-control">
+            <option value="">Select Department</option>
+        </select>
+        <span asp-validation-for="DepartmentId" class="text-danger"></span>
+    </div>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
