@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -87,7 +88,6 @@ namespace Train.Controllers
 
             return PartialView(viewModel);
         }
-
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel model)
         {
@@ -100,7 +100,6 @@ namespace Train.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
-                EmailConfirmed = false, // Email is not yet confirmed
                 Name = model.Name,
             };
             var result = await _userManager.CreateAsync(user);
@@ -108,14 +107,15 @@ namespace Train.Controllers
             if (result.Succeeded)
             {
                 // Generate email confirmation token
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                // Construct the URL for the password setup page
-                var passwordSetupUrl = Url.Action("SetPassword", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+                var callbackUrl = Url.Page("/Account/Manage/SetPassword", null, new { area = "Identity", userId = user.Id, token }, Request.Scheme);
+
+                // Separate HTML message
+                var htmlMessage = GenerateSetPasswordEmail(callbackUrl);
 
                 // Send email to the user with the password setup link
-                await _emailSender.SendEmailAsync(user.Email, "Set Your Password",
-                    $"Please set your password by clicking <a href='{passwordSetupUrl}'>here</a>.");
+                await _emailSender.SendEmailAsync(user.Email, "Set Your Password", htmlMessage);
 
                 return RedirectToAction("Index", new { success = "User has been created. Check your email to set your password." });
             }

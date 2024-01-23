@@ -102,11 +102,20 @@
     </div>
 </div>
 
-@section Scripts { 
+@section Scripts {
     <script>
         $(document).ready(function () {
-            // Handle click event on the "Create" link
-            $(".create-link").on("click", function (e) {
+            var searchInput, selectedValueInput, addBtn, dropdown, filteredOptions, options;
+
+            function initializeVariables() {
+                searchInput = $('#search-input');
+                selectedValueInput = $('#selected-value');
+                addBtn = $('.add-btn');
+                dropdown = $('#dropdown');
+                filteredOptions = [];
+            }
+
+            function handleCreateLinkClick() {
                 var url = $("#createModal").data('url');
                 $.ajax({
                     type: "GET",
@@ -115,13 +124,30 @@
                         $("#createModal .modal-body").html(data);
                         $("#createModal").modal("show");
                         $.validator.unobtrusive.parse($("#createForm"));
-                        $('#searchableDropdown').select2();
-                    }
-                });
-            });
 
-            // Handle click event on the "Edit" link
-            $(".edit-link").on("click", function (e) {
+                        initializeVariables();
+
+                        // Fetch options from the server on page load
+                        fetchOptionsFromServer().then(function (fetchedOptions) {
+                            // Update the options array
+                            options = fetchedOptions;
+                        });
+
+                        // Event Handlers
+                        searchInput.on('input focus', showOptions);
+                        searchInput.on('blur', function () {
+                            setTimeout(() => dropdown.hide(), 200);
+                        });
+                        $(".add-btn").on("click", handleAddButtonClick);
+                    },
+                    error: function (error) {
+                        console.error('Error fetching department data:', error);
+                    }
+                   
+                });
+            }
+
+            function handleEditLinkClick() {
                 var url = $("#editModal").data('url');
                 var userId = $(this).data("id");
                 // Make an AJAX request to load the employee data
@@ -138,23 +164,18 @@
                         console.error("Error loading user data");
                     }
                 });
-            });
+            }
 
-            // Handle delete event on the "Delete" link
-            $(".delete-link").on("click", function (e) {
-                e.preventDefault();
-
+            function handleDeleteLinkClick() {
                 var userId = $(this).data("id");
                 // Set the user ID in the modal for reference
-                $("#deleteModal input[name='id']").val(userId)
+                $("#deleteModal input[name='id']").val(userId);
 
                 // Show the modal
                 $("#deleteModal").modal("show");
-            });
-            
-            // Handle search event on search input
-            $(".search-input").on("input", function (e) {
-                // Handle search logic here
+            }
+
+            function handleSearchInputChange() {
                 var inputValue = $(this).val();
 
                 // Make an AJAX request to the Search Action
@@ -164,18 +185,15 @@
                     data: { query: inputValue },
                     success: function (partialView) {
                         // Update the table with the received HTML
-
                         $("#user-table").html(partialView);
                     },
                     error: function () {
                         console.error("Error performing search");
                     }
                 });
-            });
+            }
 
-            // Handle filter event on "Filter" link
-            $("#filterButton").on("click", function (e) {
-                console.log("Clicked")
+            function handleFilterButtonClick() {
                 var name = $("#filterModal input[name='Name']").val();
                 var email = $("#filterModal input[name='Email']").val();
 
@@ -190,7 +208,6 @@
                         email: email
                     },
                     success: function (partialView) {
-                        console.log("sucsees")
                         // Update the table with the received HTML
                         $("#user-table").html(partialView);
                     },
@@ -198,27 +215,82 @@
                         console.error("Error performing search");
                     }
                 });
-            });
+            }
 
-            // Handle Search department menu
-            // Add event listener to detect when a user enters a value not in the menu
-            $('#searchableDropdown').on('select2:selecting', function (e) {
-                var selectedValue = e.params.args.data.id;
+            function fetchOptionsFromServer() {
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        type: "GET",
+                        url: '/Department/GetDepartments',
+                        dataType: 'json',
+                        success: function (data) {
+                            resolve(data || []);
+                        },
+                        error: function (error) {
+                            console.error('Error fetching options from the server:', error);
+                            reject(error);
+                        }
+                    });
+                });
+            }
 
-                // Check if the selected value is the placeholder or an existing option
-                if (selectedValue === '' || $('#searchableDropdown option[value="' + selectedValue + '"]').length > 0) {
-                    // Value is either the placeholder or an existing option, hide the "Add" button
-                    $('#addDepartmentContainer').hide();
+            function showOptions() {
+                filterOptions();
+
+                dropdown.empty();
+
+                if (filteredOptions.length > 0) {
+                    $.each(filteredOptions, function (index, option) {
+                        var optionItem = $('<div class="dropdown-item"></div>')
+                            .text(option.text)
+                            .on('click', function () {
+                                searchInput.val(option.text);
+                                selectedValueInput.val(option.value);
+                                dropdown.hide();
+                            });
+
+                        dropdown.append(optionItem);
+                    });
+
+                    addBtn.hide();
+                    dropdown.show().css({ overflowY: 'auto', maxHeight: '200px' });
                 } else {
-                    // Value is not in the menu, show the "Add" button
-                    $('#addDepartmentContainer').show();
+                    addBtn.show();
+                    dropdown.hide();
                 }
-            });
-            // Add event listener to handle the "Add" button click
-            $('#addDepartmentButton').on('click', function () {
-                // You can add your logic here to handle the "Add" button click
-                alert('Add new department logic goes here.');
-            });
+            }
+
+            function filterOptions() {
+                var filter = searchInput.val().toUpperCase();
+                filteredOptions = options.filter(function (option) {
+                    return option.text.toUpperCase().includes(filter);
+                });
+            }
+
+            function handleAddButtonClick() {
+                var newItemText = searchInput.val().trim();
+                if (newItemText) {
+                    $.ajax({
+                        url: '/Department/Create',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(newItemText),
+                        success: function (data) {
+                            options.push(data);
+                            showOptions();
+                        },
+                        error: function (error) {
+                            console.error('Error adding item to the server:', error);
+                        }
+                    });
+                }
+            }
+            // Event handlers
+            $(".create-link").on("click", handleCreateLinkClick);
+            $(".edit-link").on("click", handleEditLinkClick);
+            $(".delete-link").on("click", handleDeleteLinkClick);
+            $(".search-input").on("input", handleSearchInputChange);
+            $("#filterButton").on("click", handleFilterButtonClick);
         });
     </script>
 }

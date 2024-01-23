@@ -55,15 +55,70 @@ namespace Train.Areas.Identity.Pages.Account
                     values: new { code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Password Reset</title><style>body{{font-family:Arial, sans-serif;background-color:#f4f4f4;color:#333;margin:0;padding:0;}}.container{{max-width:600px;margin:0 auto;padding:20px;}}.header{{background-color:#4285f4;color:#fff;padding:10px;text-align:center;}}.content{{background-color:#fff;padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0, 0, 0, 0.1);}}.footer{{text-align:center;margin-top:20px;color:#888;}}a{{color:#4285f4;text-decoration:none;}}a:hover{{text-decoration:underline;}}</style></head><body><div class=\"container\"><div class=\"header\"><h1>Password Reset</h1></div><div class=\"content\"><p>Hello,</p><p>You have requested to reset your password. Please click the link below to reset your password:</p><p><a href=\"{callbackUrl}\">Reset Password</a></p><p>If you did not request this, you can safely ignore this email. Your password will not be changed.</p></div><div class=\"footer\"><p>&copy; Training App</p></div></div></body></html>\r\n");
+                // Separate HTML message
+                var htmlMessage = GenerateResetPasswordEmail(callbackUrl, user.Name);
+
+                // Send email with the separated HTML message
+                await _emailSender.SendEmailAsync(Input.Email, "Reset Password", htmlMessage);
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
 
             return Page();
+        }
+        private string GenerateResetPasswordEmail(string callbackUrl, string userName)
+        {
+            return $@"
+        <!DOCTYPE html>
+        <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Password Reset</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        color: #333;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                    }}
+                    .header {{
+                        background-color: #5e72e4;
+                        color: #fff;
+                        text-align: center;
+                    }}
+                    .content {{
+                        background-color: #fff;
+                    }}
+                    .reset-password-button {{
+                        display: inline-block;
+                        background-color: #5e72e4;
+                        color: #fff;
+                        text-decoration: none;
+                        cursor: pointer;
+                    }}
+                    .footer {{
+                        text-align: center;
+                        color: #888;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'><h1>Password Reset</h1></div>
+                    <div class='content'>
+                        <p>Hello {userName},</p>
+                        <p>You have requested to reset your password. Please click the link below to reset your password:</p>
+                        <p><a href='{callbackUrl}' class='reset-password-button'>Reset Password</a></p>
+                        <p>If you did not request this, you can safely ignore this email. Your password will not be changed.</p>
+                    </div>
+                    <div class='footer'><p>&copy; Training App</p></div>
+                </div>
+            </body>
+        </html>
+    ";
         }
     }
 }

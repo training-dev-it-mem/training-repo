@@ -7,13 +7,12 @@
     @RenderSection("HeadScripts", required: false)
 </head>
 <body class="bg-default">
-    <partial name="_GoogleTagManagerBodyElement" />
-
     <div class="main-content">
         <partial name="Auth/_Navbar"/>
         @RenderSection("IdentityHeader", false)
         <!-- Page content -->
-        <div class="container pb-5">
+ 
+        <div class="col-lg-5 col-md-7">
             <!-- Page content -->
             @RenderBody()
         </div>

@@ -475,3 +475,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/Train/Areas/Identity/Pages/Account/Manage/_Layout.cshtml

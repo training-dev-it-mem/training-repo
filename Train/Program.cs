@@ -75,15 +75,16 @@ builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Ap
 builder.Services.Configure<ScriptTags>(builder.Configuration.GetSection(nameof(ScriptTags)));
 
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddRazorPages(options =>
 {
-    options.Conventions.AddAreaPageRoute("Identity", "/Account/Register", "/register");
-    options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "/login");
-    options.Conventions.AddAreaPageRoute("Identity", "/Account/Logout", "/logout");
-    options.Conventions.AddAreaPageRoute("Identity", "/Account/ForgotPassword", "/forgot-password");
+    options.Conventions
+        .AddAreaPageRoute("Identity", "/Account/Register", "/register")
+        .AddAreaPageRoute("Identity", "/Account/Login", "/login")
+        .AddAreaPageRoute("Identity", "/Account/Logout", "/logout")
+        .AddAreaPageRoute("Identity", "/Account/ForgotPassword", "/forgot-password")
+        .AddAreaPageRoute("Identity", "/Account/Manage/ChangePassword", "/change-password")
+        .AddAreaPageRoute("Identity", "/Account/Manage/SetPassword", "/setpassword");
 })
-.SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
 .AddSessionStateTempDataProvider();
 
 builder.Services.AddAuthorization(options =>
@@ -176,6 +177,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();
