@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Train.Data;
 
@@ -11,9 +12,11 @@ using Train.Data;
 namespace Train.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240127144045_RemoveManagerId")]
+    partial class RemoveManagerId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -309,9 +312,6 @@ namespace Train.Migrations
                     b.Property<DateTime>("AdattionDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -335,8 +335,6 @@ namespace Train.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Courses");
                 });
@@ -437,7 +435,7 @@ namespace Train.Migrations
             modelBuilder.Entity("Train.Models.BatchEmployees", b =>
                 {
                     b.HasOne("Train.Models.Batch", "Batch")
-                        .WithMany("Employees")
+                        .WithMany()
                         .HasForeignKey("BatchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -453,13 +451,6 @@ namespace Train.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Train.Models.Course", b =>
-                {
-                    b.HasOne("Train.Models.Identity.ApplicationUser", null)
-                        .WithMany("Courses")
-                        .HasForeignKey("ApplicationUserId");
-                });
-
             modelBuilder.Entity("Train.Models.Identity.ApplicationUser", b =>
                 {
                     b.HasOne("Train.Models.Department", "Department")
@@ -471,19 +462,9 @@ namespace Train.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("Train.Models.Batch", b =>
-                {
-                    b.Navigation("Employees");
-                });
-
             modelBuilder.Entity("Train.Models.Course", b =>
                 {
                     b.Navigation("Batches");
-                });
-
-            modelBuilder.Entity("Train.Models.Identity.ApplicationUser", b =>
-                {
-                    b.Navigation("Courses");
                 });
 #pragma warning restore 612, 618
         }

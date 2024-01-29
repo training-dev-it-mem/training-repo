@@ -1,0 +1,36 @@
+﻿@model ManageUserRolesViewModel
+
+<h2>Manage User Roles</h2>
+
+<form asp-action="UpdateRoles" method="post">
+    <input type="hidden" asp-for="UserId" />
+
+    <div>
+        <label asp-for="UserName">User Name:</label>
+        <input asp-for="UserName" readonly />
+    </div>
+
+    <div>
+        <label>Current Roles:</label>
+        @foreach (var role in Model.Roles)
+        {
+            <div>
+                <input type="checkbox" name="selectedRoles" value="@role" checked />
+                <label>@role</label>
+            </div>
+        }
+    </div>
+
+    <div>
+        <label>Select Roles:</label>
+        @foreach (var role in ViewBag.AllRoles)
+        {
+            <div>
+                <input type="checkbox" name="selectedRoles" value="@role" />
+                <label>@role</label>
+            </div>
+        }
+    </div>
+
+    <button type="submit">Update Roles</button>
+</form>

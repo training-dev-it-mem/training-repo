@@ -10,14 +10,14 @@
                     <img alt="Image placeholder" src="~/img/theme/bootstrap.jpg">
                 </span>
                 <div class="media-body  ml-2  d-none d-lg-block">
-                    <span class="mb-0 text-sm  font-weight-bold">
+                    <span class="mb-0 text-sm font-weight-bold">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            @User.GetFullNameOrEmail()
+                            @User.GetFullName().ToUpper()
                         }
                         else
                         {
-                            <span>Anonymous User</span>
+                            <span>ANONYMOUS USER</span>
                         }
                     </span>
                 </div>

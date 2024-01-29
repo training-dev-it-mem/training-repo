@@ -1,19 +1,14 @@
-﻿@{
-    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
-    {
-        Layout = parentLayout.ToString();
-    }
-    else
-    {
-        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
-    }
+﻿@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirm email";
 }
 
-@RenderBody()
-
-@section Scripts {
-    @RenderSection("Scripts", required: false)
-}
+<div class="card bg-secondary shadow border-0">
+    <div class="card-body px-lg-5 py-lg-5">
+        @Model.StatusMessage
+    </div>
+</div>
 
 @section IdentityHeader
 {

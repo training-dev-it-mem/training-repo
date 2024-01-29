@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Train.Data;
 using Train.Models.Identity;
 using Train.ViewModels;
@@ -44,6 +45,7 @@ namespace Train.Controllers
             var totalCount = _context.Users.Count(); // Get total number of records
 
             var users = _context.Users
+                .Include(u => u.Department)
                 .OrderBy(e => e.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -70,54 +72,58 @@ namespace Train.Controllers
                 Text = d.Name
             }).ToList();
 
-            var roles = _context.Roles
-                            .Where(role => role.Name != "Admin")
-                            .ToList();
-
-            var rolesList = roles.Select(r => new SelectListItem
-            {
-                Value = r.Id,
-                Text = r.Name
-            }).ToList();
-
-            var viewModel = new UserViewModel
+            var viewModel = new CreateUserViewModel
             {
                 DepartmentList = departmentList,
-                RolesList = rolesList
             };
 
             return PartialView(viewModel);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Create(UserViewModel model)
+        public async Task<IActionResult> Create(CreateUserViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return RedirectToAction("Index", new { error = "Model not valid!" });
             }
+
             // Create the user without a password
             var user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
                 Name = model.Name,
+                DepartmentId= model.DepartmentId
             };
+
             var result = await _userManager.CreateAsync(user);
 
             if (result.Succeeded)
             {
-                // Generate email confirmation token
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                try
+                {
+                    // Generate email confirmation token
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                var callbackUrl = Url.Page("/Account/Manage/SetPassword", null, new { area = "Identity", userId = user.Id, token }, Request.Scheme);
+                    var callbackUrl = Url.Page("/Account/ConfirmEmail", null, new { area = "Identity", userId = user.Id, code }, Request.Scheme);
 
-                // Separate HTML message
-                var htmlMessage = GenerateSetPasswordEmail(callbackUrl);
+                    // Separate HTML message
+                    var htmlMessage = GenerateConfirmationEmail(callbackUrl);
 
-                // Send email to the user with the password setup link
-                await _emailSender.SendEmailAsync(user.Email, "Set Your Password", htmlMessage);
+                    // Send email to the user with the password setup link
+                    await _emailSender.SendEmailAsync(user.Email, "Confirm your email", htmlMessage);
 
-                return RedirectToAction("Index", new { success = "User has been created. Check your email to set your password." });
+                    return RedirectToAction("Index", new { success = "User has been created. Email sent successfully." });
+                }
+                catch (Exception ex)
+                {
+                    // An error occurred while sending the email, handle the exception
+                    Console.WriteLine($"Error sending email: {ex.Message}");
+                    // Log the error or notify administrators
+
+                    return RedirectToAction("Index", new { success = "User has been created. Email sending failed." });
+                }
             }
             else
             {
@@ -136,29 +142,38 @@ namespace Train.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserById(string id)
+        public IActionResult Details(string userId)
         {
-            // Your edit logic here
-            var user = _context.Users.SingleOrDefault(x => x.Id == id);
-            // Return the Users data as JSON
-            return Json(new
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
             {
-                user.Id,
-                user.Name,
-                user.Email,
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
 
-            });
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+            var user = _context.Users.Include(u=>u.Department).Where(u=>u.Id == userId ).FirstOrDefault();
+
+            return View(user);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(string userId)
         {
             //First Fetch the User Details by UserId
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(userId);
             //Check if User Exists in the Database
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"User with Id = {id} cannot be found";
+                ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found";
                 return View("NotFound");
             }
             // GetClaimsAsync retunrs the list of user Claims
@@ -293,71 +308,75 @@ namespace Train.Controllers
             return PartialView("_UserTablePartial", model);
         }
 
-        // Get: Users/ChangePassword
-        [HttpGet]
-        public IActionResult UpdatePassword()
+        private string GenerateConfirmationEmail(string callbackUrl)
         {
-            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
-            {
-                // Retrieve the value of the "success" query string parameter
-                string success = successValue.ToString();
-
-                // Save the value in ViewBag to pass it to the view
-                ViewBag.SuccessMessage = success;
-            }
-            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
-            {
-                // Retrieve the value of the "success" query string parameter
-                string error = errorValue.ToString();
-
-                // Save the value in ViewBag to pass it to the view
-                ViewBag.ErrorMessage = error;
-            }
-
-            return View();
-        }
-        // Post: Users/UpdatePassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdatePassword(ChangePasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.GetUserAsync(User);
-
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-
-                if (result.Succeeded)
-                {
-                    // Password changed successfully
-                    return RedirectToAction("UpdatePassword", new { success = "Password has been updated." });
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    string serializedErrors = string.Join("; ", ModelState.Values
-                       .SelectMany(v => v.Errors)
-                       .Select(e => e.ErrorMessage));
-
-                    // If ModelState is not valid, return the view with validation errors
-                    return RedirectToAction("UpdatePassword", new { error = serializedErrors });
-                }
-            }
-            return View(model);
+            return $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Email Confirmation</title>
+    <style>
+        body{{font-family:Arial, sans-serif;background-color:#f4f4f4;color:#333;margin:0;padding:0;}}
+        .container{{max-width:600px;margin:0 auto;padding:20px;}}
+        .header{{background-color:#4285f4;color:#fff;padding:10px;text-align:center;}}
+        .content{{background-color:#fff;padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0, 0, 0, 0.1);}}
+        .footer{{text-align:center;margin-top:20px;color:#888;}}
+        a{{color:#4285f4;text-decoration:none;}}
+        a:hover{{text-decoration:underline;}}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'><h1>Email Confirmation</h1></div>
+        <div class='content'>
+            <p>Hello,</p>
+            <p>Thank you for registering with our platform. Please click the link below to confirm your email address:</p>
+            <p><a href='{callbackUrl}'>Confirm Email</a></p>
+            <p>If you did not register, you can safely ignore this email. Your account will not be activated.</p>
+        </div>
+        <div class='footer'><p>&copy; Training App</p></div>
+    </div>
+</body>
+</html>
+";
         }
 
-
-    
-
-
+        private string GenerateSetPasswordEmail(string callbackUrl)
+        {
+            return $@"
+        <!DOCTYPE html>
+        <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Set Password</title>
+                <style>
+                    body{{font-family:Arial, sans-serif;background-color:#f4f4f4;color:#333;margin:0;padding:0;}}
+                    .container{{max-width:600px;margin:0 auto;padding:20px;}}
+                    .header{{background-color:#4285f4;color:#fff;padding:10px;text-align:center;}}
+                    .content{{background-color:#fff;padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0, 0, 0, 0.1);}}
+                    .footer{{text-align:center;margin-top:20px;color:#888;}}
+                    a{{color:#4285f4;text-decoration:none;}}
+                    a:hover{{text-decoration:underline;}}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'><h1>Set Password</h1></div>
+                    <div class='content'>
+                        <p>Hello,</p>
+                        <p>You have been invited to set your password. Please click the link below to set your password:</p>
+                        <p><a href='{callbackUrl}'>Set Password</a></p>
+                        <p>If you did not request this, you can safely ignore this email. Your password will not be changed.</p>
+                    </div>
+                    <div class='footer'><p>&copy; Training App</p></div>
+                </div>
+            </body>
+        </html>
+    ";
+        }
     }
 }
 

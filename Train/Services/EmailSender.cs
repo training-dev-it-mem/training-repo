@@ -6,7 +6,7 @@ using Train.Models;
 
 namespace Train.Services { 
 public class EmailSender : IEmailSender
-{
+    {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
@@ -16,9 +16,7 @@ public class EmailSender : IEmailSender
         _configuration = configuration;
     }
 
-    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
-    {
-        try
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             // Read API settings from appsettings.json
             var apiUrl = _configuration["EmailSettings:ApiUrl"];
@@ -58,29 +56,9 @@ public class EmailSender : IEmailSender
                     // Handle unsuccessful response
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Error: {errorMessage}");
-                    throw new EmailSendException(errorMessage);
+                    // You may log the error message or perform other actions if needed
                 }
             }
         }
-        catch (HttpRequestException ex)
-        {
-            // Handle HTTP request exceptions
-            Console.WriteLine($"Error making HTTP request: {ex.Message}");
-            throw new EmailSendException(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            // Handle other exceptions
-            Console.WriteLine($"Error: {ex.Message}");
-            throw new EmailSendException(ex.Message);
-        }
     }
-}
-
-public class EmailSendException : Exception
-{
-    public EmailSendException(string message) : base(message)
-    {
-    }
-}
 }

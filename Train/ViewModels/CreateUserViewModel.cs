@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Train.ViewModels
 {
-    public class UserViewModel
+    public class CreateUserViewModel
     {
         [Required]
         [Display(Name = "Name")]
@@ -18,10 +18,6 @@ namespace Train.ViewModels
         [Display(Name = "Department")]
         public string DepartmentId { get; set; }
 
-        [Display(Name = "Roles")]
-        public string[] Roles { get; set; }
-
         public List<SelectListItem>? DepartmentList { get; set; }
-        public List<SelectListItem>? RolesList { get; set; }
     }
 }

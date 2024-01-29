@@ -75,6 +75,7 @@ builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Ap
 builder.Services.Configure<ScriptTags>(builder.Configuration.GetSection(nameof(ScriptTags)));
 
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions
@@ -83,9 +84,10 @@ builder.Services.AddRazorPages(options =>
         .AddAreaPageRoute("Identity", "/Account/Logout", "/logout")
         .AddAreaPageRoute("Identity", "/Account/ForgotPassword", "/forgot-password")
         .AddAreaPageRoute("Identity", "/Account/Manage/ChangePassword", "/change-password")
-        .AddAreaPageRoute("Identity", "/Account/Manage/SetPassword", "/setpassword");
+        .AddAreaPageRoute("Identity", "/Account/ForgotPassword", "/set-password");
 })
 .AddSessionStateTempDataProvider();
+
 
 builder.Services.AddAuthorization(options =>
 {

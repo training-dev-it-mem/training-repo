@@ -41,10 +41,6 @@ html {
   min-height: 100%;
 }
 
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
-}
 .footer {
   position: absolute;
   bottom: 0;
@@ -59,7 +55,8 @@ body {
     height: calc(1.5em + 1.25rem + 5px);
 }
 
-/* Fix Table Header */
+/* Fix Table Header
+    --------------------------------------------------- */
 .row {
     margin-right: 0;
     margin-left: 0;

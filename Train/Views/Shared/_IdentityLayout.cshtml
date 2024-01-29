@@ -1,26 +1,27 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
-    <partial name="_PageHeadElement"/>
+    <head>
+        <partial name="_PageHeadElement"/>
     
-    @RenderSection("Styles", required: false)
-    @RenderSection("HeadScripts", required: false)
-</head>
-<body class="bg-default">
-    <div class="main-content">
-        <partial name="Auth/_Navbar"/>
-        @RenderSection("IdentityHeader", false)
-        <!-- Page content -->
- 
-        <div class="col-lg-5 col-md-7">
+        @RenderSection("Styles", required: false)
+        @RenderSection("HeadScripts", required: false)
+    </head>
+    <body class="bg-default">
+        <div class="main-conten h-100vh">
+            <partial name="Auth/_Navbar"/>
+            @RenderSection("IdentityHeader", false)
             <!-- Page content -->
-            @RenderBody()
+        <div class="row flex-column justify-content-center align-items-center">
+            <div class="col-lg-3 col-md-5">
+                    <!-- Page content -->
+                    @RenderBody()
+                </div>
+            </div>
+
+            <partial name="Auth/_Footer"/>
+            <partial name="_ThemeScripts"/>
+
+            @RenderSection("Scripts", required: false)
         </div>
-        <partial name="Auth/_Footer"/>
-    </div>
-
-    <partial name="_ThemeScripts"/>
-
-    @RenderSection("Scripts", required: false)
-</body>
+    </body>
 </html>

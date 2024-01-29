@@ -1,0 +1,124 @@
+﻿@model ApplicationUser
+<div class="card">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <span>Name:</span>
+                    </div>
+                    <div class="col">
+                        <span>@Model.Name</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <span>Email:</span>
+                    </div>
+                    <div class="col">
+                        <span>@Model.Email</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <span>Department</span>
+                    </div>
+                    <div class="col">
+                        <span>@Model.Department.Name</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-1">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item edit-link" data-id="@Model.Id">Edit</a>
+                        <a class="dropdown-item manageRoles-link" data-id="@Model.Id">Manage Roles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Models -->
+<!-- Edit User Model -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" data-url='@Url.Action("Edit")'>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+<!-- Manage Role Model -->
+<div class="modal fade" id="manageRolesModal" tabindex="-1" role="dialog" data-url='@Url.Action("ManageRoles","Roles")'>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Manage Roles</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+    @section Scripts {
+    <script>
+        $(document).ready(function () {
+            function handleEditLinkClick() {
+                var url = $("#editModal").data('url');
+                var userId = $(this).data("id");
+                // Make an AJAX request to load the employee data
+                $.ajax({
+                    type: "GET",
+                    url: url, // Replace with your actual action method
+                    data: { userId: userId },
+                    success: function (view) {
+                        $("#editModal .modal-body").html(view);
+                        $("#editModal").modal("show");
+                        $.validator.unobtrusive.parse($("#editForm"));
+                    },
+                    error: function () {
+                        console.error("Error loading user data");
+                    }
+                });
+            }
+            function handleMangeRolesLinkClick() {
+                var url = $("#manageRolesModal").data('url');
+                var userId = $(this).data("id");
+                // Make an AJAX request to load the employee data
+                $.ajax({
+                    type: "GET",
+                    url: url, // Replace with your actual action method
+                    data: { userId: userId },
+                    success: function (view) {
+                        $("#editModal .modal-body").html(view);
+                        $("#editModal").modal("show");
+                        $.validator.unobtrusive.parse($("#editForm"));
+                    },
+                    error: function () {
+                        console.error("Error loading user data");
+                    }
+                });
+            }
+            // Event handlers
+            // Edit handler
+            $(".edit-link").on("click", handleEditLinkClick);
+
+            // Manage roles handler
+            $(".manageRoles-link").on("click", handleMangeRolesLinkClick);
+
+        });
+    </script>
+}

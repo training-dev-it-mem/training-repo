@@ -7,7 +7,7 @@
     </div>
     @if (SignInManager.IsSignedIn(User))
     {
-        <a href="@Url.Action("UpdatePassword", "Users")" class="dropdown-item">
+        <a class="dropdown-item" href="/change-password">
             <i class="ni ni-single-02"></i>
             <span>Change Password</span>
         </a>

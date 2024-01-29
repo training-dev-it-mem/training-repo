@@ -8,7 +8,6 @@ namespace Train.Models.Identity
     {
         [PersonalData]
         public string Name { get; set; }
-        public string ManagerId { get; set; }
         public string DepartmentId { get; set; }
         public Department Department { get; set; }
         public ICollection<Course> Courses { get; set; }

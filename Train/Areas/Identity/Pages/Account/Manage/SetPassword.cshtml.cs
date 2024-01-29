@@ -42,6 +42,7 @@ namespace Train.Areas.Identity.Pages.Account.Manage
             public string ConfirmPassword { get; set; }
         }
 
+
         public async Task<IActionResult> OnGetAsync(string userId, string token)
         {
             // Validate the token and user ID

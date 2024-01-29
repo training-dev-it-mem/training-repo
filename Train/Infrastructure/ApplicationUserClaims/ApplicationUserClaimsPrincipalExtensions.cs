@@ -13,8 +13,8 @@ namespace Train.Infrastructure.ApplicationUserClaims
 
         public static string GetFullName(this ClaimsPrincipal principal)
         {
-            var fullName = principal.Claims.FirstOrDefault(c => c.Type == "FullName");
-            return fullName?.Value;
+            var name = principal.Claims.FirstOrDefault(c => c.Type == "Name");
+            return name?.Value;
         }
 
         // You can add other extension methods here to access user properties exposed
