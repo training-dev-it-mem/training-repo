@@ -1,139 +1,138 @@
 ﻿@using Train.Enums;
 @model CoursesViewModel
+@functions {
+    // Helper function to truncate a string to a specified word count
+    string TruncateString(string input, int maxWords)
+    {
+        string[] words = input.Split(' ');
+        int displayWordCount = Math.Min(maxWords, words.Length);
+        string truncatedString = string.Join(' ', words.Take(displayWordCount));
+
+        if (words.Length > displayWordCount)
+        {
+            truncatedString += "...";
+        }
+
+        return truncatedString;
+    }
+}
+
 <!-- Light table -->
 <div id="course-table"/>
-    <div class="table-responsive">
-         <!-- Light table -->
-            <div class="table-responsive">
-                <table class="table align-items-center table-flush">
-                    <thead class="thead-light">
-                        <tr>
+<div class="table-responsive">
+<!-- Light table -->
+<div class="table-responsive">
+    <table class="table align-items-center table-flush">
+        <thead class="thead-light">
+            <tr>
 
-                            <th scope="col" class="sort" data-sort="name">Name</th>
-                            <th scope="col" class="sort" data-sort="Description">Description</th>
-                            <th scope="col" class="sort" data-sort="AdattionDate">Adattion Date</th>
-                            <th scope="col" class="sort" data-sort="Location">Location</th>
-                            <th scope="col" class="sort" data-sort="Seats">Seats</th>
-                            <th scope="col" class="sort" data-sort="Status">Status</th>                  
-                            <th scope="col" class="sort" data-sort="Action">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="list">
-                        @foreach (var course in Model.Courses)
-                        {
-                            <tr>
-
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Name</span>
-                                        </div>
-                                    </div>
-                                </th>
-
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Description</span>
-                                        </div>
-                                    </div>
-                                </th>
-
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.AdattionDate.ToString("dd/MM/yyyy")</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Location</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@course.Seats</span>
-                                        </div>
-                                    </div>
-                                </th>
-
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            @if (course.Status == ProgramStatus.Draft)
-                                            {
-                                                <span class="badge badge-default">@course.Status</span>
-                                            }
-                                            else if (course.Status == ProgramStatus.Sent)
-                                            {
-                                                <span class="badge badge-info">@course.Status</span>
-                                            }
-                                            else if (course.Status == ProgramStatus.Compelete)
-                                            {
-                                                <span class="badge badge-success">@course.Status</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-default">@course.Status</span>
-                                            }
-                                        </div>
-                                    </div>
-                                </th>
-
-                                 
-
-                                <th>
-                                    <!-- Add icon with link to show the _ManagerLayout modal -->
-                            <a href="@Url.Action("Assign", "Managers", new { courseId = course.Id })" class="btn btn-sm btn-icon btn-outline-success assign-link" data-id="@course.Id">
-                                        <i class="ni ni-bullet-list-67"></i> Assign
-                                    </a>
-
-                                    <!-- Edit icon with link to show the Edit modal -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary edit-link" data-id="@course.Id">
-                                        <i class="ni ni-ruler-pencil"></i> Edit
-                                    </a>
-                                    <!-- Push icon with link to Push action -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-primary push-link" data-id="@course.Id">
-                                        <i class="ni ni-send"></i> Push
-                                    </a>
-                                    <!-- Delete icon with link to Delete action -->
-                                    <a href="#" class="btn btn-sm btn-icon btn-outline-danger delete-link" data-id="@course.Id">
-                                        <i class="ni ni-basket"></i> Delete
-                                    </a>
-                                </th>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                <th scope="col" class="sort" data-sort="name">Name</th>
+                <th scope="col" class="sort" data-sort="Description">Description</th>
+                <th scope="col" class="sort" data-sort="AdattionDate">Adattion Date</th>
+                <th scope="col" class="sort" data-sort="Location">Location</th>
+                <th scope="col" class="sort" data-sort="Seats">Seats</th>
+                <th scope="col" class="sort" data-sort="Status">Status</th>
+                <th scope="col" class="sort" data-sort="Action">Action</th>               
+            </tr>
+        </thead>
+<tbody class="list">
+@foreach (var course in Model.Courses)
+{
+    <tr>
+        <th scope="row" data-toggle="tooltip" data-placement="top" title="@course.Name">
+            <div class="media align-items-center">
+                <div class="media-body">
+                    <span class="name mb-0 text-sm">@TruncateString(course.Name, 3)</span>
+                </div>
             </div>
+        </th>
+            <th scope="row" data-toggle="tooltip" data-placement="top" title="@course.Description">
+            <div class="media align-items-center">
+                <div class="media-body">
+                    <span class="name mb-0 text-sm">@TruncateString(course.Description, 3)</span>
+                </div>
+            </div>
+        </th>
 
-        <!-- Table Pagination -->
-        <div class="card-footer py-4">
-            <nav aria-label="...">
-                <ul class="pagination justify-content-end mb-4">
-                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber - 1, pageSize = Model.PageSize })" tabindex="-1">
-                            <i class="fa fa-angle-left" aria-hidden="true"></i>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                    </li>
-                    @for (int i = 1; i <= Model.TotalCount / Model.PageSize + 1; i++)
-                    {
-                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">@i</a>
-                        </li>
-                    }
-                    <li class="page-item @(Model.PageNumber == Model.TotalCount / Model.PageSize + 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber + 1, pageSize = Model.PageSize })">
-                            <i class="fa fa-angle-right" aria-hidden="true"></i>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+    <th scope="row">
+        <div class="media align-items-center">
+            <div class="media-body">
+                <span class="name mb-0 text-sm">@course.AdattionDate.ToString("dd/MM/yyyy")</span>
+            </div>
         </div>
-    </div>
+    </th>
+        <th scope="row" data-toggle="tooltip" data-placement="top" title="@course.Location">
+        <div class="media align-items-center">
+            <div class="media-body">
+                <span class="name mb-0 text-sm">@TruncateString(course.Location, 3)</span>
+            </div>
+        </div>
+    </th>
+    <th scope="row">
+        <div class="media align-items-center">
+            <div class="media-body">
+                <span class="name mb-0 text-sm">@course.Seats</span>
+            </div>
+        </div>
+    </th>
+
+    <th scope="row">
+        <div class="media align-items-center">
+            <div class="media-body">
+                @if (course.Status == ProgramStatus.Draft)
+                {
+                    <span class="badge badge-default">@course.Status</span>
+                }
+                else if (course.Status == ProgramStatus.Sent)
+                {
+                    <span class="badge badge-info">@course.Status</span>
+                }
+                else if (course.Status == ProgramStatus.Compelete)
+                {
+                    <span class="badge badge-success">@course.Status</span>
+                }
+                else
+                {
+                    <span class="badge badge-default">@course.Status</span>
+                }
+            </div>
+        </div>
+    </th>
+        <th>
+            <!-- Add icon with link to manage the course  -->
+            <a href="@Url.Action("Details", "Courses", new { courseId = course.Id })" class="btn btn-sm btn-icon btn-outline-success">
+                <i class="ni ni-bullet-list-67"></i> Manage
+            </a>
+        </th>
+    </tr>
+     }
+        </tbody>
+    </table>
+</div>
+
+<!-- Table Pagination -->
+<div class="card-footer py-4">
+<nav aria-label="...">
+<ul class="pagination justify-content-end mb-4">
+    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+        <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber - 1, pageSize = Model.PageSize })" tabindex="-1">
+            <i class="fa fa-angle-left" aria-hidden="true"></i>
+            <span class="sr-only">Previous</span>
+        </a>
+    </li>
+    @for (int i = 1; i <= Model.TotalCount / Model.PageSize + 1; i++)
+    {
+        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+            <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">@i</a>
+        </li>
+    }
+    <li class="page-item @(Model.PageNumber == Model.TotalCount / Model.PageSize + 1 ? "disabled" : "")">
+        <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber + 1, pageSize = Model.PageSize })">
+            <i class="fa fa-angle-right" aria-hidden="true"></i>
+            <span class="sr-only">Next</span>
+        </a>
+    </li>
+</ul>
+</nav>
+</div>
+</div>

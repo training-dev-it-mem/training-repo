@@ -58,15 +58,10 @@ namespace Train.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(string courseId)
         {
-            // Assume you retrieve a list of managers from your data source
-            var courses = _context.Courses.ToList(); // Replace with your Course retrieval logic
-
-            // Populate ViewBag.Managers with the list of managers
-            ViewBag.Programs = courses;
-
-            return PartialView();
+            var batchViewModel = new BatchViewModel { CourseId=courseId};
+            return PartialView(batchViewModel);
         }
 
         [HttpPost]
@@ -74,7 +69,7 @@ namespace Train.Controllers
         {
             // logic
             if (!ModelState.IsValid)
-                return RedirectToAction("Index", new { error = "Model not valid!" });
+                return RedirectToAction("Details","Courses", new { error = "Model not valid!" });
 
             var batch = new Batch
             {
@@ -88,35 +83,86 @@ namespace Train.Controllers
             _context.Batches.Add(batch);
             _context.SaveChanges();
             // return to list of batches
-            return RedirectToAction("Index", new { success = "batch has been created." });
+            return RedirectToAction("Details","Courses", new {courseId=batch.CourseId, success = "batch has been created." });
         }
-        [HttpGet]
-        public IActionResult GetBatchId(string id)
+        
+        public IActionResult Details(string batchId)
         {
-            // Your edit logic here
-            var batch = _context.Batches.SingleOrDefault(x => x.Id == id);
-            return Json(new
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
             {
-                batch.Id,
-                batch.StartDate,
-                batch.EndDate,
-                batch.StartTime,
-                batch.EndTime
-               
-            });
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+            var batch = _context.Batches
+                .Include(ub => ub.Employees)
+                .ThenInclude(e=>e.Employee)
+                .Where(c => c.Id == batchId)
+                .FirstOrDefault();
+
+            var employees = batch.Employees.Select(e => e.Employee).ToList();
+
+            var viewModel = new BatchDetailsViewModel
+            {
+                Id = batch.Id,
+                StartDate = batch.StartDate,
+                EndDate = batch.EndDate,
+                StartTime = batch.StartTime,
+                EndTime = batch.EndTime,
+                Employees = employees,
+                PageNumber = 1,
+                PageSize = 5,
+                TotalCount = employees.Count()
+            };
+
+            return View(viewModel);
         }
 
+        [HttpGet]
+        public IActionResult Edit(string id)
+        {
+            var batch = _context.Batches.Find(id);
+            var model = new BatchViewModel
+            {
+                Id = batch.Id,
+                StartDate= batch.StartDate,
+                EndDate= batch.EndDate,
+                StartTime= batch.StartTime,
+                EndTime= batch.EndTime,
+                CourseId= batch.CourseId
+            };
+            return PartialView(model);
+        }
 
         [HttpPost]
-        public IActionResult Edit(Batch batch)
+        public IActionResult Edit(BatchViewModel model)
         {
-            // Your edit logic here
-            // validate
+            if (!ModelState.IsValid)
+                return RedirectToAction("Details", new
+                { batchId = model.Id, page = 1, pageSize = 5, error = "Batch not Updated." });
 
-            // update database 
-            _context.Update(batch);
+            var batch = _context.Batches.Find(model.Id);
+
+            batch.StartDate = model.StartDate;
+            batch.EndDate = model.EndDate;
+            batch.StartTime = model.StartTime;
+            batch.EndTime = model.EndTime;
+
+            _context.Batches.Update(batch);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+
+            return RedirectToAction("Details", new
+            { batchId = model.Id, page = 1, pageSize = 5, success = "Batch has been Updated." });
         }
 
         // POST: Batch/Delete/5
@@ -129,9 +175,10 @@ namespace Train.Controllers
             {
                 return RedirectToAction("Index", new { error = "user not found." });
             }
+            var courseId=batch.CourseId;
             _context.Batches.Remove(batch);
             _context.SaveChanges();
-            return RedirectToAction("Index", new { success = "Batch has been deleted" });
+            return RedirectToAction("Details", "Courses", new { courseId });
         }
 
         // Search action
@@ -170,36 +217,36 @@ namespace Train.Controllers
         }
 
         //Filter
-        public IActionResult Filter(DateTime startdate, DateTime enddate)
+        public IActionResult Filter(string courseId, string dateRange,int page = 1, int pageSize = 5)
         {
-            IQueryable<Batch> batchQuery = _context.Batches;
+            var course = _context.Courses
+                .Include(c=>c.Batches)
+                .Where(c=> c.Id==courseId)
+                .FirstOrDefault();
 
-            if (startdate != default(DateTime))
-            {
-                batchQuery = batchQuery.Where(btc => btc.StartDate >= startdate);
-            }
+            var arrDates = dateRange.Split("-");
 
-            if (enddate != default(DateTime))
-            {
-                batchQuery = batchQuery.Where(btc => btc.EndDate <= enddate);
-            }
+            DateTime startDate = DateTime.Parse(arrDates[0]);
+            DateTime endDate = DateTime.Parse(arrDates[1]);
 
-            var batches = batchQuery.OrderBy(e => e.StartDate)
-                                           .Take(5)
-                                           .ToList();
+            var batches = course.Batches
+                .Where(b => b.StartDate.Date >= startDate.Date && b.StartDate.Date <= endDate.Date
+                && b.EndDate.Date >= startDate.Date
+                && b.EndDate.Date <= endDate.Date)
+                .Skip((page-1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            var model = new BatchsViewModel
+            var model = new CourseDetailsViewModel
             {
                 batches = batches,
-                TotalCount = batchQuery.Count(),
-                PageSize = 5,
-                PageNumber = 1
+                TotalCount = batches.Count(),
+                PageSize = pageSize,
+                PageNumber = page
             };
 
             return PartialView("_BatchTablePartial", model);
         }
-
-
 
 
     }

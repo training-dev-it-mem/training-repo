@@ -11,5 +11,6 @@ namespace Train.Models.Identity
         public string ManagerId { get; set; }
         public string DepartmentId { get; set; }
         public Department Department { get; set; }
+        public ICollection<Course> Courses { get; set; }
     }
 }

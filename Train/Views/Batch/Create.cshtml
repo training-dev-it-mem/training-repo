@@ -1,4 +1,4 @@
-﻿@model Batch
+﻿@model BatchViewModel
 
 <form asp-controller="Batch" asp-action="Create" method="post" id="createForm" onsubmit="onSubmit();">
 <div asp-validation-summary="ModelOnly">
@@ -28,17 +28,8 @@
             <span asp-validation-for="EndTime" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="CourseId" class="form-control-label"></label>
-            <select asp-for="CourseId" class="form-control" id="courseId">
-                <option value="">Select the Course you want to add Batch to it</option>
-                @foreach (var course in ViewBag.Programs)
-                {
-                    <option value="@course.Id">@course.Name</option>
-                }
-            </select>
-            <span asp-validation-for="CourseId" class="text-danger"></span>
-        </div>
+        <!-- Input hidden for save course id-->
+        <input asp-for="CourseId" type="hidden" />
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

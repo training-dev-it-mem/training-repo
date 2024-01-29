@@ -1,7 +1,8 @@
 ﻿@model CourseViewModel
 
-<form asp-controller="Courses" asp-action="Create" method="post" id="createForm" onsubmit="onSubmit();">
+<form asp-controller="Courses" asp-action="Edit" method="post" id="editForm" onsubmit="onSubmit();">
 <div class="modal-body">
+    <input asp-for="Id" type="hidden"/>
     <div class="form-group">
         <label asp-for="Name" class="form-control-label"></label>
         <input asp-for="Name" class="form-control" />
@@ -26,6 +27,7 @@
         <input asp-for="Seats" class="form-control" />
         <span asp-validation-for="Seats" class="text-danger"></span>
     </div>
+</div>
 <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
     <input type="submit" class="btn btn-primary" name="submit" />

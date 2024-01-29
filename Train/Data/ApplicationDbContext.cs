@@ -19,5 +19,11 @@ namespace Train.Data
         public DbSet<Batch> Batches { get; set; }
         public DbSet<BatchEmployees> BatchEmployees { get; set; }
         public DbSet<Department> Departments { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

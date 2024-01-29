@@ -1,0 +1,74 @@
+﻿@model BatchEmployeesViewModel
+<!-- Search form -->
+<form class="col-sm-6 navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
+    <div class="form-group mb-0">
+        <div class="input-group input-group-alternative input-group-merge">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </span>
+            </div>
+            <input class="form-control employees-search-input" placeholder="Search" type="text">
+        </div>
+    </div>
+    <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main" aria-label="Close">
+        <span aria-hidden="true">×</span>
+    </button>
+</form>
+<form asp-controller="Employees" asp-action="Assign" method="post" id="assignForm" onsubmit="onSubmit();">
+    <input asp-for="BatchId" type="hidden" />
+    <div class="modal-body">
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col" class="sort" data-sort="Name">Name</th>
+                            <th scope="col" class="sort" data-sort="Email">Email</th>
+                            <th scope="col" class="sort" data-sort="Department">Department</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody class="list">
+                        @foreach (var employee in Model.Employees)
+                        {
+                            <tr>
+                                 <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                        <input type="checkbox" value="@employee.Id" name="employeeIds">
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@employee.Name</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@employee.Email</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="media align-items-center">
+                                        <div class="media-body">
+                                            <span class="name mb-0 text-sm">@employee.Department.Name</span>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Assign</button>
+    </div>
+</form>

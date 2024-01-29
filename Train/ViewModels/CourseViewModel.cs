@@ -1,30 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Train.Enums;
 using Train.Models;
+using Train.Models.Identity;
 
 namespace Train.ViewModels
 {
     public class CourseViewModel
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the name")]
-        [MinLength(5, ErrorMessage = "The field must be at least 7 characters long.")]
-        [RegularExpression(@"^[a-zA-Z\s'.-]{5,40}$", ErrorMessage = "only alphabetic allowed")]
+        [Required(ErrorMessage = "Please enter course name")]
+        [RegularExpression(@"^[a-zA-Z0-9\s'.-]{1,25}$", ErrorMessage = "Only letters, numbers, and whitespace allowed with a maximum of 25 characters")]
         public string Name { get; set; }
 
-        [RegularExpression(@"^[a-zA-Z\s'.-]{5,100}$", ErrorMessage = "only alphabetic allowed")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the description")]
-        [MinLength(5, ErrorMessage = "The field must be at least 5 characters long.")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter course description")]
+        [RegularExpression(@"^[a-zA-Z0-9\s'.-]{1,150}$", ErrorMessage = "Only letters, numbers, and whitespace allowed with a maximum of 150 characters")]
         public string Description { get; set; }
+        [Required(ErrorMessage = "Please enter location")]
+        [RegularExpression(@"^[a-zA-Z0-9\s'.-]{1,25}$", ErrorMessage = "Only letters, numbers, and whitespace allowed with a maximum of 25 characters")]
         public string Location { get; set; }
-
-        [Required(ErrorMessage = "Please select a status")]
-        public ProgramStatus Status { get; set; }
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter the date")]
-        public DateTime AdattionDate { get; set; }
+        public DateTime AdattionDate { get; set; } = DateTime.Now;
         public int Seats { get; set; }
-        public string CreatedBy { get; set; }
     }
 }

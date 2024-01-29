@@ -5,6 +5,7 @@ using Train.Models;
 using Train.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Train.Models.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Train.Controllers
 {
@@ -56,6 +57,8 @@ namespace Train.Controllers
                 TotalCount = totalCount
             };
 
+            var courses = _context.Courses.ToList();
+
             return View(viewModel);
 
 
@@ -64,15 +67,13 @@ namespace Train.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return PartialView();
+            var model = new CourseViewModel();
+            return PartialView(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CourseViewModel model)
         {
-            if (!ModelState.IsValid)
-                return RedirectToAction("Index", new { error = "Model not valid!" });
-
             // Get the current logged-in user
             ApplicationUser user = await _userManager.GetUserAsync(User);
 
@@ -85,7 +86,6 @@ namespace Train.Controllers
                     AdattionDate = model.AdattionDate,
                     Location = model.Location,
                     Seats = model.Seats,
-                    Status = model.Status,
                     UserId = user.Id
                 };
 
@@ -101,48 +101,85 @@ namespace Train.Controllers
             return RedirectToAction("Index", new { error = "User not found!" });
         }
 
-
-       
-
-
         [HttpGet]
-        public IActionResult GetCoursesId(string id)
+        public IActionResult Details(string courseId, int page = 1, int pageSize = 5)
         {
-            // Your edit logic here
-            var course = _context.Courses.SingleOrDefault(x => x.Id == id);
-            return Json(new
+            if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
             {
-                course.Id,
-                course.Name,
-                course.Description,
-                course.Location,
-                course.AdattionDate,
-                course.Seats
-            });
+                // Retrieve the value of the "success" query string parameter
+                string success = successValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.SuccessMessage = success;
+            }
+            if (HttpContext.Request.Query.TryGetValue("error", out var errorValue))
+            {
+                // Retrieve the value of the "success" query string parameter
+                string error = errorValue.ToString();
+
+                // Save the value in ViewBag to pass it to the view
+                ViewBag.ErrorMessage = error;
+            }
+            var course = _context.Courses
+                .Include(c => c.Batches)
+                .Where(c => c.Id == courseId).FirstOrDefault();
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == course.UserId);
+            var userName = user != null ? user.Name : "لا يوجد";
+            var viewModel = new CourseDetailsViewModel
+            {
+                Id = course.Id,
+                Name = course.Name,
+                Description = course.Description,
+                Location = course.Location,
+                AdattionDate = course.AdattionDate,
+                Seats = course.Seats,
+                Status = course.Status,
+                CreatedBy = userName,
+                batches = course.Batches.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
+                PageNumber = page,
+                PageSize = 5,
+                TotalCount = course.Batches.Count()
+            };
+            return View(viewModel);
         }
 
-        
+        [HttpGet]
+        public IActionResult Edit(string id)
+        {
+            var course = _context.Courses.Find(id);
+            var model = new CourseViewModel
+            {
+                Id = course.Id,
+                Name = course.Name,
+                Description = course.Description,
+                Location = course.Location,
+                AdattionDate = course.AdattionDate,
+                Seats = course.Seats
+            };
+            return PartialView(model);
+        }
+
         [HttpPost]
         public IActionResult Edit(CourseViewModel model)
         {
-            // Your edit logic here
-            // validate
-            var course = new Course
-            {
-                Name = model.Name,
-                Description = model.Description,
-                Location = model.Location,
-                Status= model.Status,
-                AdattionDate= model.AdattionDate,
-                //Seats = model.Seats,
+            if(!ModelState.IsValid)
+                return RedirectToAction("Details", new
+                { courseId = model.Id, page = 1, pageSize = 5, error = "Cousre not Updated." });
+            var course = _context.Courses.Find(model.Id);
+            course.Name = model.Name;
+            course.Description = model.Description;
+            course.Location = model.Location;
+            course.AdattionDate = model.AdattionDate;
+            course.Seats = model.Seats;
 
-            };
-            // update database 
-            _context.Update(course);
+            _context.Courses.Update(course);
             _context.SaveChanges();
-            return RedirectToAction("Index");
-        }
 
+            return RedirectToAction("Details", new
+            { courseId = model.Id, page = 1, pageSize = 5, success="Cousre has been Updated." });
+        }
+        
         // POST: Courses/Push/5
         [HttpPost]
         public IActionResult Push(string id)
@@ -166,13 +203,12 @@ namespace Train.Controllers
 
             if (course == null)
             {
-                return RedirectToAction("Index", new { error = "user not found." });
+                return RedirectToAction("Index", new { error = "course not found." });
             }
             _context.Courses.Remove(course);
             _context.SaveChanges();
             return RedirectToAction("Index", new { success = "course has been deleted" });
         }
-
 
         // Search action
         public IActionResult Search(string query)
@@ -209,31 +245,43 @@ namespace Train.Controllers
         }
 
         //Filter
-        public IActionResult Filter(string name, string description, string location, ProgramStatus status)
+        public IActionResult Filter(string name,string additionDate , ProgramStatus status)
         {
-            List<Course> courses;
+            IQueryable<Course> coursesQuery = _context.Courses;
 
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(description) 
-                || string.IsNullOrWhiteSpace(location ))
+            if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(additionDate) && status == null)
             {
-                // If the query is empty, return all employees
-                courses = _context.Courses.ToList();
+                // If all filters are empty, return all courses
+                coursesQuery = _context.Courses;
             }
-            else
+           
+            // Apply filters if provided
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                courses = _context.Courses
-                    .Where(e => e.Name.StartsWith(name) ||
-                                e.Description.StartsWith(description)
-                                ||
-                                e.Location.StartsWith(location)
-                              
-                                
-                                ).ToList();
+                coursesQuery = coursesQuery.Where(e => e.Name.StartsWith(name));
             }
 
-            courses = courses.OrderBy(e => e.Name)
-                .Take(5)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(additionDate))
+            {
+                var arrDates = additionDate.Split("-");
+
+                DateTime startDate = DateTime.Parse(arrDates[0]);
+                DateTime endDate = DateTime.Parse(arrDates[1]);
+
+                coursesQuery = coursesQuery
+                    .Where(e => e.AdattionDate.Date >= startDate.Date
+                    && e.AdattionDate <= endDate.Date);
+            }
+
+            if (status !=null)
+            {
+                coursesQuery = coursesQuery.Where(e => e.Status == status);
+            }
+            
+
+            List<Course> courses = coursesQuery.OrderBy(e => e.Name)
+                                       .Take(5)
+                                       .ToList();
 
             var model = new CoursesViewModel
             {

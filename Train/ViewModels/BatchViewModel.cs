@@ -13,9 +13,9 @@ namespace Train.ViewModels
         [DisplayFormat]
         [DataType(DataType.Date)]
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; }= DateTime.Now;
         [DataType(DataType.Date)]
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; } = DateTime.Now;
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
 

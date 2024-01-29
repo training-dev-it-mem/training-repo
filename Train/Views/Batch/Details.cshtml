@@ -1,28 +1,85 @@
-﻿@section Links {
+﻿@model BatchDetailsViewModel
+@section Links {
     <partial name="Topnav/_FilterAndCreateLinks" />
 }
-<div class="row">
-    <div class="col">
-        <div class="card">
-            <!-- Card header -->
-            <div class="row card-header border-0">
-                <h3 class="col-sm-4 mb-0">Batch table</h3>
-                <!-- Search form -->
-                <partial name="_SearchTable" />
+
+<div class="card">
+<!-- Card body -->
+<div class="card-body">
+    <div class="row">
+        <div class="col-10">
+            <h3>
+                Course Batch Details:
+            </h3>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Actions
+                </button>
+                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                    <a class="dropdown-item edit-link" data-id="@Model.Id">Edit</a>
+                    <a class="dropdown-item delete-link" data-id="@Model.Id">Delete</a>
+                    
+                </div>
             </div>
-            <!-- Course Table -->
-            <partial name="_BatchTablePartial" />
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            Start Date:
+        </div>
+        <div class="col-auto">
+            @Model.StartDate.ToString("dd-MM-yyyy")
         </div>
     </div>
+    <div class="row">
+        <div class="col-3">
+            End Date:
+        </div>
+        <div class="col-auto">
+            @Model.EndDate.ToString("dd-MM-yyyy")
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            Start Time:
+        </div>
+        <div class="col-3">
+            @Model.StartTime
+        </div>
+    </div>
+    <div class="row">
+            <div class="col-3">
+                End Time:
+            </div>
+            <div class="col-3">
+                @Model.EndTime
+            </div>
+        </div>
+
+    <!-- Light table -->
+    <!-- Emplyees Table -->
+    <div class="row card-header border-0">
+        <h3 class="col-sm-4 mb-0">Employees table</h3>
+        <!-- Search form -->
+        <partial name="_SearchTable" />
+    </div>
+    <partial name="_EmployeeTablePartial" />
+</div>
+   
+
 </div>
 
-            
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" role="dialog" data-url='@Url.Action("Create")'>
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<!-- Go back link -->
+
+<!-- Bootstrap Models -->
+<!-- Assign Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1" role="dialog" data-id="@Model.Id">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-title">Create Form</h5>
+                <h5 class="modal-title" id="modal-title">Assign Form</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -32,7 +89,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -44,41 +100,10 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" asp-action="Edit" asp-controller="Batch">
-                <input type="hidden" for="Id" name="Id" /> <!-- Hidden field for the employee ID -->
-
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="StartDate" class="form-control-label">Start Date</label>
-                        <input for="StartDate" name="StartDate" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label for="EndDate" class="form-control-label">End Date</label>
-                        <input for="EndDate" name="EndDate" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="StartTime" class="form-control-label">Start Time</label>
-                        <input for="StartTime" name="StartTime" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="EndTime" class="form-control-label">End Time</label>
-                        <input for="EndTime" name="EndTime" class="form-control" />
-                    </div>
-                    
-
-                    <!-- Add other form fields as needed -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
+            <div class="modal-body"></div>
         </div>
     </div>
 </div>
-
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -91,9 +116,9 @@
                 </button>
             </div>
             <form method="post" asp-action="Delete" asp-controller="Batch">
-                <input type="hidden" name="id" /> <!-- Hidden field for the Batch ID -->
+                <input type="hidden" name="id" /> <!-- Hidden field for the Course ID -->
                 <div class="modal-body">
-                    <p>Are you sure you want to delete this Batch?</p>
+                    <p>Are you sure you want to delete this batch?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -103,7 +128,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Filter Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -127,51 +151,66 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button id="filterButton" type="button" class="btn btn-primary">Filter</button>
             </div>
-            </div>
-            
-            </div>
         </div>
+
+    </div>
+</div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
 
-            // Handle click event on the "Create" link
+            // Handle click event on the "Assign" link
             $(".create-link").on("click", function (e) {
-                var url = $("#createModal").data('url');
+                var url = "/Employees/Assign";
+                var batchId = $("#assignModal").data("id");
                 $.ajax({
                     type: "GET",
                     url: url,
-                    success: function (data) {
-                        console.log(data);
-                        $("#createModal .modal-body").html(data);
-                        $("#createModal").modal("show");
-                        $.validator.unobtrusive.parse($("#createForm"));
+                    data: { batchId: batchId },
+                    success: function (view) {
+                        $("#assignModal .modal-body").html(view);
+                        $("#assignModal").modal("show");
+                        $.validator.unobtrusive.parse($("#assignForm"));
+                        // Handle search event on search input
+                        $(".employees-search-input").on("input", function (e) {
+                            // Handle search logic here
+                            var inputValue = $(this).val();
+
+                            // Make an AJAX request to the Search Action
+                            $.ajax({
+                                url: "/Employees/Search",
+                                method: "GET",
+                                data: { query: inputValue },
+                                success: function (partialView) {
+                                    // Update the table with the received HTML
+                                    $("#batch-table").html(partialView);
+                                },
+                                error: function () {
+                                    console.error("Error performing search");
+                                }
+                            });
+                        });
+                    },
+                    error: function () {
+                        console.error("Error loading employee data");
                     }
                 });
             });
 
             // Handle click event on the "Edit" link
             $(".edit-link").on("click", function (e) {
-                e.preventDefault();
 
                 var batchId = $(this).data("id");
-                console.log("ID :", batchId);
                 // Make an AJAX request to load the employee data
                 $.ajax({
-                    url: "/Batch/GetBatchId", // Replace with your actual action method
+                    url: "/Batch/Edit", // Replace with your actual action method
                     method: "GET",
                     data: { id: batchId },
-                    success: function (batch) {
-                        // Populate the modal with the employee data
-                        $("#editModal input[name='Id']").val(batch.id);
-                        $("#editModal input[name='StartDate']").val(batch.startDate);
-                        $("#editModal input[name='EndDate']").val(batch.endDate);
-                        $("#editModal input[name='StartTime']").val(batch.startTime);
-                        $("#editModal input[name='EndTime']").val(batch.endTime);
-
-                        // Show the modal
+                    success: function (view) {
+                        $("#editModal .modal-body").html(view);
                         $("#editModal").modal("show");
+                        $.validator.unobtrusive.parse($("#editForm"));
                     },
                     error: function () {
                         console.error("Error loading employee data");
@@ -189,7 +228,6 @@
                 // Show the modal
                 $("#deleteModal").modal("show");
             });
-
 
             // Handle search event on search input
             $(".search-input").on("input", function (e) {
@@ -211,7 +249,6 @@
                 });
             });
 
-
             // Handle filter event on "Filter" link
             $("#filterButton").on("click", function (e) {
                 var startDate = $("#filterModal input[name='StartDate']").val();
@@ -221,7 +258,7 @@
 
                 // AJAX call to the controller action
                 $.ajax({
-                    url: "/Batch/Filter",
+                    url: "/Employees/Filter",
                     method: "GET",
                     data: {
                         startDate: startDate,
@@ -229,15 +266,15 @@
                     },
                     success: function (partialView) {
                         // Update the table with the received HTML
-                        $("#batch-table").html(partialView);
+                        $("#batchemployee-table").html(partialView);
                     },
                     error: function () {
                         console.error("Error performing search");
                     }
                 });
             });
-
-
         });
     </script>
 }
+
+    

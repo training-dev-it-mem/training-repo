@@ -1,0 +1,271 @@
+﻿@model CourseDetailsViewModel
+@section Links {
+    <partial name="Topnav/_FilterAndCreateLinks" />
+}
+    <div class="card">
+        <!-- Card body -->
+        <div class="card-body">
+        <a asp-action="Index">Go to Courses</a>
+        <div class="row">
+        <div class="col-10">
+                <h3>Course Details
+         </h3>
+         </div>
+         <div class="col-auto">
+              <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                       Actions
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <a class="dropdown-item edit-link" data-id="@Model.Id">Edit</a>
+                        <a class="dropdown-item delete-link" data-id="@Model.Id">Delete</a>
+                    </div>
+                </div>
+         </div>
+        </div>
+        
+        </div>
+        <div class="row">
+                <div class="col-3">
+                    Course Name:
+                </div>
+            <div class="col-auto">
+                @Model.Name
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                Course Description:
+            </div>
+            <div class="col-auto">
+                @Model.Description
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                Course Location:
+            </div>
+            <div class="col-3">
+                @Model.Location
+            </div>
+            <div class="col-3">
+                Course Adattion Date:
+            </div>
+            <div class="col-3">
+                @Model.AdattionDate
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                Course Seats:
+            </div>
+            <div class="col-3">
+                @Model.Seats
+            </div>
+            <div class="col-3">
+                Course Status:
+            </div>
+            <div class="col-3">
+                @Model.Status
+            </div>
+
+           
+            <div class="col-3">
+                Course created by:
+            </div>
+            <div class="col-3">
+                @Model.CreatedBy
+            </div>
+        </div>
+   
+    <!-- Light table -->
+    <!-- Course Table -->
+    <partial name="_BatchTablePartial" />
+</div>
+
+ <!-- Bootstrap Models -->
+ <!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" data-id="@Model.Id">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Create Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Edit Form -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Edit Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="Delete" asp-controller="Courses">
+                <input type="hidden" name="id" /> <!-- Hidden field for the Course ID -->
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this Course?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" data-id="@Model.Id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Filter Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <input type="hidden" for="Id" name="Id" />
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="date-range" class="form-control-label">Date Range</label>
+                    <input type="text" class="form-control" id="date-range">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="filterButton" type="button" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+
+            $('#date-range').datepicker({
+                startView: 0,
+                minViewMode: 0,
+                maxViewMode: 2,
+                multidate: true,
+                multidateSeparator: "-",
+                autoClose: true,
+                beforeShowDay: highlightRange,
+            }).on("changeDate", function (event) {
+                var dates = event.dates,
+                    elem = $('#date-range');
+                if (elem.data("selecteddates") == dates.join(",")) return;
+                if (dates.length > 2) dates = dates.splice(dates.length - 1);
+                dates.sort(function (a, b) { return new Date(a).getTime() - new Date(b).getTime() });
+                elem.data("selecteddates", dates.join(",")).datepicker('setDates', dates);
+            });
+            
+              function highlightRange(date) {
+                            var selectedDates = $('#date-range').datepicker('getDates');
+                if (selectedDates.length === 2 && date >= selectedDates[0] && date <= selectedDates[1]) {
+                  return 'highlighted';
+                }
+                return '';
+              }
+            // Event handlers
+            // Handle click event on the "Create" link
+            $(".create-link").on("click", function (e) {
+                var url = "/Batch/Create";
+                var courseId = $("#createModal").data("id");
+                $.ajax({
+                type: "GET",
+                url: url,
+                data:{courseId: courseId},
+                success: function (data) {
+                    console.log(data);
+                    $("#createModal .modal-body").html(data);
+                    $("#createModal").modal("show");
+                    $.validator.unobtrusive.parse($("#createForm"));
+                    }
+                });
+            });
+
+            // Handle click event on the "Edit" link
+            $(".edit-link").on("click", function (e) {
+                var courseId = $(this).data("id");
+                // Make an AJAX request to load the course data
+                $.ajax({
+                    url: "/Courses/Edit", // Replace with your actual action method
+                    method: "GET",
+                    data: { id: courseId },
+                    success: function (view) {
+                        $("#editModal .modal-body").html(view);
+                        $("#editModal").modal("show");
+                        $.validator.unobtrusive.parse($("#editForm"));
+                    }
+                });
+            });
+
+            // Handle click event on the "Delete" link
+            $(".delete-link").on("click", function (e) {
+                e.preventDefault();
+                var courseId = $(this).data("id");
+                // Set the course ID in the modal for reference
+                $("#deleteModal input[name='id']").val(courseId);
+
+                // Show the modal
+                $("#deleteModal").modal("show");
+
+
+            });
+
+            // Handle filter event on "Filter" link
+            $("#filterButton").on("click", function (e) {
+                var courseId = $("#filterModal").data("id");
+                var dateRange = $("#filterModal #date-range").val();
+               
+                $("#filterModal").modal("hide");
+
+                // AJAX call to the controller action
+                $.ajax({
+                    url: "/Batch/Filter",
+                    method: "GET",
+                    data: {
+                        courseId: courseId,
+                        dateRange: dateRange
+                    },
+                    success: function (view) {
+                        // Update the table with the received HTML
+                        $("#batch-table").html(view);
+                    },
+                    error: function () {
+                        console.error("Error performing search");
+                    }
+                });
+            });
+
+        });
+    </script>
+}
+
+

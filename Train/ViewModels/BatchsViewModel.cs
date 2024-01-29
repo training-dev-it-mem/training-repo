@@ -8,5 +8,7 @@ namespace Train.ViewModels
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
+        public List<BatchEmployees> Employees { get; set; }
+        
     }
 }

@@ -1,0 +1,48 @@
+﻿@model List<Course>
+<!DOCTYPE html>
+<html>
+<head>
+    <partial name="_PageHeadElement" />
+    <title>Manage Course</title>
+    <h5>Course Name: @(Model.Any() ? Model.First().Name : "No courses available")</h5>
+    <!-- Include your styles directly here if needed -->
+    <link rel="stylesheet" href="your-styles.css" />
+</head>
+<body>
+    <div class="main-content">
+        <!-- ... (rest of your HTML) ... -->
+
+        <div>
+            <h2>Manage Courses</h2>
+            <table>
+                <!-- ... (rest of your table structure) ... -->
+            </table>
+        </div>
+
+        <!-- Page content -->
+        <div class="container-fluid mt--6">
+            <!-- Page content -->
+            @RenderBody()
+            <partial name="_ThemeScripts" />
+            <!-- Add client validation script -->
+            <partial name="_ValidationScriptsPartial" />
+            @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+            {
+                <script>
+                    // Display Toastr notification with the success message
+                    toastr.success('@Html.Raw(ViewBag.SuccessMessage)');
+                </script>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <script>
+                    // Display Toastr notification with the success message
+                    toastr.error('@Html.Raw(ViewBag.ErrorMessage)');
+                </script>
+            }
+            @RenderSection("Scripts", required: false)
+        </div>
+    </div>
+</body>
+</html>
+

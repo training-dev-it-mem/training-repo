@@ -21,5 +21,6 @@ namespace Train.Models
         public string CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course Course { get; set; }
+        public ICollection<BatchEmployees> Employees { get; set; }
     }
 }

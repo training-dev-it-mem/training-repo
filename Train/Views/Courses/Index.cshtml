@@ -21,13 +21,12 @@
     </div>
 </div>
            
-
 <!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" data-url='@Url.Action("Create")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-title">Create New Course</h5>
+                <h5 class="modal-title" id="modal-title">Create Form</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -144,24 +143,11 @@
                         <label for="Name" class="form-control-label">Name</label>
                         <input for="Name" name="Name" class="form-control" />
                     </div>
-                    <div class="form-group">
-                        <label for="Description" class="form-control-label">Description</label>
-                        <input for="Description" name="Description" class="form-control" />
-                    </div>
-
+                    
                     <div class="form-group">
                         <label for="additionDate" class="form-control-label">Addition Date</label>
-                        <input class="form-control" type="date" value="2018-11-23" id="additionDate" name="AdattionDate">
+                        <input type="text" class="form-control" id="date-range">
                     </div>
-                    <div class="form-group">
-                        <label for="Location" class="form-control-label">Location</label>
-                        <input for="Location" name="Location" class="form-control" />
-                    </div>
-
-                <div class="form-group">
-                    <label for="Seats" class="form-control-label">Number of Seats</label>
-                    <input for="Seats" name="Seats" class="form-control" />
-                </div>
                 <div class="form-group">
                     <label for="Status" class="form-control-label">Status</label>
                     <select name="selectedStatus" class="form-control">
@@ -185,37 +171,64 @@
     <script>
         $(document).ready(function () {
 
-            // Handle click event on the "Add" link
-            $(".assign-link").click(function (e) {
-                e.preventDefault();
-
-                var courseId = $(this).data("id");
-                var courseName = $(this).data("name");
-                var courseDescription = $(this).data("description");
-
-                // Update the content dynamically
-                $("#courseName").text(courseName);
-                $("#courseDescription").text(courseDescription);
+            $('#date-range').datepicker({
+                startView: 0,
+                minViewMode: 0,
+                maxViewMode: 2,
+                multidate: true,
+                multidateSeparator: "-",
+                autoClose: true,
+                beforeShowDay: highlightRange,
+            }).on("changeDate", function (event) {
+                var dates = event.dates,
+                    elem = $('#date-range');
+                if (elem.data("selecteddates") == dates.join(",")) return;
+                if (dates.length > 2) dates = dates.splice(dates.length - 1);
+                dates.sort(function (a, b) { return new Date(a).getTime() - new Date(b).getTime() });
+                elem.data("selecteddates", dates.join(",")).datepicker('setDates', dates);
             });
-        });
 
+            function highlightRange(date) {
+                var selectedDates = $('#date-range').datepicker('getDates');
+                if (selectedDates.length === 2 && date >= selectedDates[0] && date <= selectedDates[1]) {
+                    return 'highlighted';
+                }
+                return '';
+            }
+            // Event handlers
             // Handle click event on the "Create" link
             $(".create-link").on("click", function (e) {
-                console.log("create link clicked");
-            var url = $("#createModal").data('url');
-                console.log(url);
+                var url = "/Batch/Create";
+                var courseId = $("#createModal").data("id");
                 $.ajax({
-                        type: "GET",
-                        url: url,
-                        success: function (data) {
-                            console.log(data);
-                            $("#createModal .modal-body").html(data);
-                            $("#createModal").modal("show");
-                            $.validator.unobtrusive.parse($("#createForm"));
-                        }
+                    type: "GET",
+                    url: url,
+                    data: { courseId: courseId },
+                    success: function (data) {
+                        console.log(data);
+                        $("#createModal .modal-body").html(data);
+                        $("#createModal").modal("show");
+                        $.validator.unobtrusive.parse($("#createForm"));
+                    }
                 });
             });
 
+
+            // Event Handlers
+            // Handle click event on the "New" link
+            $(".create-link").on("click", function (e) {
+                var url = $("#createModal").data('url');
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    success: function (data) {
+                        console.log(data);
+                        $("#createModal .modal-body").html(data);
+                        $("#createModal").modal("show");
+                        $.validator.unobtrusive.parse($("#createForm"));
+                    }
+                });
+            });
 
             // Handle click event on the "Edit" link
             $(".edit-link").on("click", function (e) {
@@ -237,6 +250,7 @@
                         $("#editModal select[name='Location']").val(course.location);
                         $("#editModal select[name='Seats']").val(course.seats);
                         // Show the modal
+
                         $("#editModal").modal("show");
                     },
                     error: function () {
@@ -244,7 +258,6 @@
                     }
                 });
             });
-
 
             // Handle click event on the "Push" link
             $(".push-link").on("click", function (e) {
@@ -270,7 +283,6 @@
 
             });
 
-
             // Handle search event on search input
             $(".search-input").on("input", function (e) {
                 // Handle search logic here
@@ -292,13 +304,10 @@
             });
 
            // Handle filter event on "Filter" link
-                $("#filterButton").on("click", function (e) {
+            $("#filterButton").on("click", function (e) {
                     var name = $("#filterModal input[name='Name']").val();
-                    var description = $("#filterModal input[name='Description']").val();
-                    var location = $("#filterModal input[name='Location']").val();
-                    var additionDate = $("#filterModal input[name='AdattionDate']").val();
+                    var additionDate = $("#filterModal #date-range").val();
                     var status = $("#filterModal input[name='selectedStatus']").val();
-                    var status = $("#filterModal input[name='Seats']").val();
                     $("#filterModal").modal("hide");
 
                     // AJAX call to the controller action
@@ -307,23 +316,19 @@
                         method: "GET",
                         data: {
                             name: name,
-                            description: description,
-                            location: location,
                             additionDate: additionDate,
                             status: status,
-                            seats: seats
+                            
                         },
-                        success: function (partialView) {
+                        success: function (view) {
                             // Update the table with the received HTML
-                            $("#course-table").html(partialView);
+                            $("#course-table").html(view);
                         },
                         error: function () {
                             console.error("Error performing search");
                         }
                     });
-                });
-
-
+            });
 
         });
     </script>

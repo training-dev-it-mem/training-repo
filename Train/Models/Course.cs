@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Train.Enums;
+using Train.Models.Identity;
 
 namespace Train.Models
 {
