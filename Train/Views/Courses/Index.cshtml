@@ -170,7 +170,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-
             $('#date-range').datepicker({
                 startView: 0,
                 minViewMode: 0,
@@ -187,7 +186,6 @@
                 dates.sort(function (a, b) { return new Date(a).getTime() - new Date(b).getTime() });
                 elem.data("selecteddates", dates.join(",")).datepicker('setDates', dates);
             });
-
             function highlightRange(date) {
                 var selectedDates = $('#date-range').datepicker('getDates');
                 if (selectedDates.length === 2 && date >= selectedDates[0] && date <= selectedDates[1]) {
@@ -212,7 +210,6 @@
                     }
                 });
             });
-
 
             // Event Handlers
             // Handle click event on the "New" link

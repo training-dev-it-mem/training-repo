@@ -35,12 +35,12 @@
                 <!-- Navigation -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/" ? "active" : "")" href="@Url.Action("Index")">
+                        <a class="nav-link @(Context.Request.Path == "/" ? "active" : "")" href="@Url.Action("Index", "Home")">
                             <i class="ni ni-tv-2 text-primary"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path == "/" ? "active" : "")" href="@Url.Action("Index", "Users")">
+                        <a class="nav-link @(Context.Request.Path == "/users" ? "active" : "")" href="@Url.Action("Index", "Users")">
                             <i class="ni ni-single-02 text-purple"></i>Users
                         </a>
                     </li>
