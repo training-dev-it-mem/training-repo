@@ -1,74 +1,256 @@
-﻿@model BatchEmployeesViewModel
-<!-- Search form -->
-<form class="col-sm-6 navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
-    <div class="form-group mb-0">
-        <div class="input-group input-group-alternative input-group-merge">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                </span>
+﻿@model AssignEmployeesViewModel
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <!-- Card header -->
+            <div class="row card-header border-0">
+                <h3 class="col-sm-4 mb-0">Employees Table</h3>
+                <!-- Search form -->
+                <form class="col-sm-6 navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
+                    <div class="form-group mb-0">
+                        <div class="input-group input-group-alternative input-group-merge">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                            <input class="form-control search-input" placeholder="Search" type="text" oninput="onFilter(1, this.value)">
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </form>
             </div>
-            <input class="form-control employees-search-input" placeholder="Search" type="text">
-        </div>
-    </div>
-    <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main" aria-label="Close">
-        <span aria-hidden="true">×</span>
-    </button>
-</form>
-<form asp-controller="Employees" asp-action="Assign" method="post" id="assignForm" onsubmit="onSubmit();">
-    <input asp-for="BatchId" type="hidden" />
-    <div class="modal-body">
-            <div class="table-responsive">
-                <table class="table align-items-center table-flush">
-                    <thead class="thead-light">
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col" class="sort" data-sort="Name">Name</th>
-                            <th scope="col" class="sort" data-sort="Email">Email</th>
-                            <th scope="col" class="sort" data-sort="Department">Department</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody class="list">
-                        @foreach (var employee in Model.Employees)
-                        {
+                <input type="hidden" asp-for="BatchId" />
+                <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush" id="employees-table">
+                        <thead class="thead-light">
                             <tr>
-                                 <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                        <input type="checkbox" value="@employee.Id" name="employeeIds">
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Name</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Email</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <th scope="row">
-                                    <div class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm">@employee.Department.Name</span>
-                                        </div>
-                                    </div>
-                                </th>
+                                <th scope="col"></th>
+                                <th scope="col" class="sort" data-sort="Name">Name</th>
+                                <th scope="col" class="sort" data-sort="Email">Email</th>
+                                <th scope="col" class="sort" data-sort="Department">Department</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                            <tbody class="list">
+                                @foreach (var employee in Model.Employees)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" value="@employee.Id" id="checkbox_@employee.Id" onchange="handleCheckboxChange(this);">
+                                                <label class="custom-control-label" for="checkbox_@employee.Id"></label>
+                                            </div>
+                                        </td>
+                                        <td>@employee.Name</td>
+                                        <td>@employee.Email</td>
+                                        <td>@employee.Department.Name</td>
+                                    </tr>
+                                }
+                            </tbody>
+                    </table>
+                </div>
+                    <!-- Table Pagination -->
+                    <div class="card-footer py-4">
+                        <nav aria-label="...">
+                            <ul class="pagination justify-content-end mb-4">
+                                <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0);" onclick="onFilter(@Model.PageNumber - 1);">
+                                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                                @for (int i = 1; i <= Model.TotalCount / Model.PageSize + 1; i++)
+                                {
+                                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0);" onclick="onFilter(@i);">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(Model.PageNumber == Model.TotalCount / Model.PageSize + 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0);" onclick="onFilter(@Model.PageNumber + 1);">
+                                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="onEmployeesAssign();">Assign</button>
+                </div>
         </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Assign</button>
     </div>
+</div>
+<form id="assignEmployeesForm" action="/Employees/Assign" method="post">
+    <!-- Include any hidden fields or additional data you need to send -->
+    <input type="hidden" name="batchId" value="@Model.BatchId">
+    <input type="hidden" name="selectedEmployeeIds" id="selectedEmployeeIdsInput" value="">
 </form>
+
+@section Scripts {
+    <script>
+        const selectedEmployeesArray = [];
+
+        function handleCheckboxChange(checkbox) {
+            const employeeId = checkbox.value;
+
+            if (checkbox.checked) {
+                selectedEmployeesArray.push(employeeId);
+            } else {
+                const index = selectedEmployeesArray.indexOf(employeeId);
+                if (index !== -1) {
+                    selectedEmployeesArray.splice(index, 1);
+                }
+            }
+
+            updateSelectedEmployees();
+        }
+
+        // Function to handle page change and search events
+        function onFilter(pageNumber, searchTerm = "") {
+            renderRowsSkeleton(); // Show skeleton rows
+
+            const batchId = "@Model.BatchId";
+
+            // Introduce a delay before making the AJAX request
+            setTimeout(function () {
+                $.ajax({
+                    url: "/Employees/Filter",
+                    method: "GET",
+                    data: { batchId: batchId, page: pageNumber, searchTerm: searchTerm },
+                    dataType: "json",
+                    success: function (data) {
+                        if (isValidData(data)) {
+                            updateTable(data.employees);
+                            updatePaginationLinks(data.pageNumber, data.totalCount, data.pageSize);
+                        } else {
+                            console.error("Invalid data structure received:", data);
+                        }
+
+                        removeSkeleton(); // Remove or replace skeleton rows
+                    },
+                    error: function () {
+                        console.error("Error fetching employees");
+
+                        removeSkeleton(); // Remove or replace skeleton rows in case of an error
+                    }
+                });
+            }, 200); // 200 milliseconds (1 second) delay
+        }
+
+        function updateSelectedEmployees() {
+            $("#SelectedEmployeeIds").val(selectedEmployeesArray.join(","));
+            console.log("Selected Employees Array:", selectedEmployeesArray);
+        }
+
+        // Function to update the table with actual data
+        function updateTable(employees) {
+            const tbody = $("#employees-table tbody");
+            tbody.empty();
+
+            for (const employee of employees) {
+                const row = `<tr>
+                    <td>
+                        <div class='custom-control custom-checkbox'>
+                                    <input type='checkbox' class='custom-control-input' value='${employee.id}' name='SelectedEmployeeIds' id='checkbox_${employee.id}' ${selectedEmployeesArray.includes(employee.id) ? "checked" : ""} onChange="handleCheckboxChange(this);">
+                            <label class='custom-control-label' for='checkbox_${employee.id}'></label>
+                        </div>
+                    </td>
+                    <td>${employee.name}</td>
+                    <td>${employee.email}</td>
+                    <td>${employee.department.name}</td>
+                </tr>`;
+
+                tbody.append(row);
+            }
+        }
+
+        function isValidData(data) {
+            return data && data.employees && Array.isArray(data.employees);
+        }
+
+        function updatePaginationLinks(currentPage, totalCount, pageSize) {
+            const totalPages = Math.ceil(totalCount / pageSize);
+            const paginationList = $(".pagination");
+            paginationList.empty();
+
+            paginationList.append(createPageLink("", currentPage > 1, () => onFilter(currentPage - 1), "fa fa-angle-left"));
+
+            for (let i = 1; i <= totalPages; i++) {
+                const isActive = i === currentPage;
+                paginationList.append(createPageLink(i, !isActive, () => onFilter(i), null, isActive));
+            }
+
+            paginationList.append(createPageLink("", currentPage < totalPages, () => onFilter(currentPage + 1), "fa fa-angle-right"));
+        }
+
+        function createPageLink(text, isEnabled, onClick, iconClass = null, isActive = false) {
+            const linkClass = isActive ? "page-item active" : "page-item";
+            const link = $("<li>", { class: linkClass }).append(
+                $("<a>", {
+                    class: "page-link",
+                    href: "#",
+                    text: text,
+                    click: isEnabled ? onClick : null
+                }).append(iconClass ? $("<i>", { class: iconClass, "aria-hidden": "true" }) : null)
+            );
+
+            return link;
+        }
+
+        // Function to render 5 rows with animated background in table body for 1 second
+        function renderRowsSkeleton() {
+            const tbody = $("#employees-table tbody");
+            const skeletonRows = Array.from({ length: 5 }, () => {
+                const row = $("<tr>");
+
+                for (let i = 0; i < 4; i++) {
+                    const cell = $("<td>", { class: 'skeleton-cell' }).html("&nbsp;");
+                    row.append(cell);
+                }
+
+                return row;
+            });
+
+            tbody.html(skeletonRows);
+        }
+
+        // Function to remove or replace skeleton rows
+        function removeSkeleton() {
+            // You can adjust this based on your HTML structure
+            // For example, if you wrap skeleton rows in a specific element, you can remove or replace that element
+            const skeletonRows = $(".skeleton-row");
+            skeletonRows.remove();
+        }
+
+        // Function to assign employees
+        function onEmployeesAssign() {
+            const selectedEmployeeIds = selectedEmployeesArray;
+
+            if (selectedEmployeeIds.length === 0) {
+                console.error("No employees selected for assignment.");
+                return;
+            }
+
+            // Add any additional logic or confirmation dialogs as needed
+
+            // Example: Confirm the assignment
+            const confirmAssign = confirm("Are you sure you want to assign the selected employees?");
+
+            if (!confirmAssign) {
+                return;
+            }
+
+            // Set the selected employee ids in the hidden input
+            $("#selectedEmployeeIdsInput").val(selectedEmployeeIds.join(","));
+
+            // Submit the form
+            document.getElementById("assignEmployeesForm").submit();
+        }
+
+     </script>
+}

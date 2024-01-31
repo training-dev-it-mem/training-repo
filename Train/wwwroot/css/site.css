@@ -36,10 +36,6 @@ button.accept-policy {
 
 /* Sticky footer styles
 -------------------------------------------------- */
-html {
-  position: relative;
-  min-height: 100%;
-}
 
 .footer {
   position: absolute;
@@ -61,3 +57,26 @@ html {
     margin-right: 0;
     margin-left: 0;
 }
+
+/* Keyframes for the skeleton background animation */
+@keyframes skeletonBackground {
+    0% {
+        background-color: #f0f0f0; /* Light gray */
+    }
+
+    50% {
+        background-color: #e0e0e0; /* Slightly darker gray */
+    }
+
+    100% {
+        background-color: #f0f0f0; /* Light gray */
+    }
+}
+
+/* Skeleton cell styles with animation */
+.skeleton-cell {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+    animation: skeletonBackground 1s infinite ease-in-out;
+}
+

@@ -1,46 +1,59 @@
 ﻿@model ApplicationUser
+<style>
+    tr {
+        border-bottom: none;
+    }
+</style>
 <div class="card">
     <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="row">
-                    <div class="col">
-                        <span>Name:</span>
-                    </div>
-                    <div class="col">
-                        <span>@Model.Name</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <span>Email:</span>
-                    </div>
-                    <div class="col">
-                        <span>@Model.Email</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <span>Department</span>
-                    </div>
-                    <div class="col">
-                        <span>@Model.Department.Name</span>
-                    </div>
-                </div>
+        <table class="table align-items-center table-flush">
+            <tbody class="list">
+                <tr scope="row">
+                        <td>
+                            Name:
+                        </td>
+                        <td>
+                            @Model.Name
+                        </td>
+                        <th>
+                            <a href="" class="btn btn-primary" onclick="onChangeName();">Change</a>
+                        </th>
+                    </tr>
+                <tr scope="row">
+                    <td>
+                        Email:
+                    </td>
+                    <td>
+                        @Model.Email
+                    </td>
+                    <th>
+                        <a href="" class="btn btn-primary" onclick="onChangeEmail();">Change</a>
+                    </th>
+                </tr>
+                <tr scope="row">
+                    <td>
+                        Department:
+                    </td>
+                    <td>
+                        @Model.Department.Name
+                    </td>
+                    <th>
+                        <a href="" class="btn btn-primary" onclick="onChangeDeparment();">Change</a>
+                    </th>
+                </tr>
+                </tbody>
+            </table>
+        <div class="card text-center">
+            <div class="card-header">
+                Roles
             </div>
-            <div class="col-1">
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Actions
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item edit-link" data-id="@Model.Id">Edit</a>
-                        <a class="dropdown-item manageRoles-link" data-id="@Model.Id">Manage Roles</a>
-                    </div>
-                </div>
+            <div class="card-body">
+                @* <h5 class="card-title">Special title treatment</h5> *@
+                <a href="#" class="btn btn-primary">User</a>
+                <a href="#" class="btn btn-outline-primary">Manager</a>
             </div>
         </div>
-    </div>
+            </div>
 </div>
 
 <!-- Bootstrap Models -->
@@ -72,7 +85,24 @@
         </div>
     </div>
 </div>
-
+@section Breadcrumbs{
+    <div class="col-lg-6 col-7">
+        <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
+        <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                <li class="breadcrumb-item">
+                    <a href="#">
+                        <i class="fas fa-home"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Dashboards</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Default</li>
+            </ol>
+        </nav>
+    </div>
+}
     @section Scripts {
     <script>
         $(document).ready(function () {

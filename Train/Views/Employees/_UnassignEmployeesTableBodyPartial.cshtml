@@ -1,0 +1,18 @@
+﻿@model AssignEmployeesViewModel
+
+<tbody class="list">
+    @foreach (var employee in Model.Employees)
+    {
+        <tr>
+            <td>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" value="@employee.Id" name="SelectedEmployeeIds" onchange="onCheckboxChange(this)">
+                    <label class="custom-control-label" for="checkbox_@employee.Id"></label>
+                </div>
+            </td>
+            <td>@employee.Name</td>
+            <td>@employee.Email</td>
+            <td>@employee.Department.Name</td>
+        </tr>
+    }
+</tbody>

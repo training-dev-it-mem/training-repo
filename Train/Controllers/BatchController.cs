@@ -86,7 +86,7 @@ namespace Train.Controllers
             return RedirectToAction("Details","Courses", new {courseId=batch.CourseId, success = "batch has been created." });
         }
         
-        public IActionResult Details(string batchId)
+        public IActionResult Details(string batchId, int page = 1,int pageSize = 5)
         {
             if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
             {
@@ -119,9 +119,9 @@ namespace Train.Controllers
                 EndDate = batch.EndDate,
                 StartTime = batch.StartTime,
                 EndTime = batch.EndTime,
-                Employees = employees,
-                PageNumber = 1,
-                PageSize = 5,
+                Employees = employees.Skip((page-1) * pageSize).Take(pageSize).ToList(),
+                PageNumber = page,
+                PageSize = pageSize,
                 TotalCount = employees.Count()
             };
 

@@ -74,22 +74,6 @@
 <!-- Go back link -->
 
 <!-- Bootstrap Models -->
-<!-- Assign Modal -->
-<div class="modal fade" id="assignModal" tabindex="-1" role="dialog" data-id="@Model.Id">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-title">Assign Form</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Modal for Edit Form -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -162,40 +146,14 @@
 
             // Handle click event on the "Assign" link
             $(".create-link").on("click", function (e) {
-                var url = "/Employees/Assign";
-                var batchId = $("#assignModal").data("id");
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    data: { batchId: batchId },
-                    success: function (view) {
-                        $("#assignModal .modal-body").html(view);
-                        $("#assignModal").modal("show");
-                        $.validator.unobtrusive.parse($("#assignForm"));
-                        // Handle search event on search input
-                        $(".employees-search-input").on("input", function (e) {
-                            // Handle search logic here
-                            var inputValue = $(this).val();
 
-                            // Make an AJAX request to the Search Action
-                            $.ajax({
-                                url: "/Employees/Search",
-                                method: "GET",
-                                data: { query: inputValue },
-                                success: function (partialView) {
-                                    // Update the table with the received HTML
-                                    $("#batch-table").html(partialView);
-                                },
-                                error: function () {
-                                    console.error("Error performing search");
-                                }
-                            });
-                        });
-                    },
-                    error: function () {
-                        console.error("Error loading employee data");
-                    }
-                });
+                var batchId = "@Model.Id";
+
+                // Construct the URL with the batchId parameter
+                var url = "/Employees/Assign?batchId=" + batchId;
+
+                // Redirect the user to the specified URL
+                window.location.href = url;
             });
 
             // Handle click event on the "Edit" link
@@ -276,5 +234,3 @@
         });
     </script>
 }
-
-    

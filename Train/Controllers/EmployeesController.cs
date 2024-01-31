@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
 using Train.Data;
 using Train.Models;
 using Train.Models.Identity;
@@ -19,35 +20,67 @@ namespace Train.Controllers
         [HttpGet]
         public IActionResult Assign(string batchId)
         {
-            // Batch employees
-            var batchEmployees = _context.BatchEmployees.Where(b=> b.BatchId == batchId).Select(be=>be.Employee).ToList();
-            var employeesNotAssigntoThisBatch = _context.Users.Include(user=>user.Department)
-                .Where(user => !batchEmployees.Contains(user)).ToList();
-            var model = new BatchEmployeesViewModel 
-            {
-                BatchId=batchId,
-                Employees= employeesNotAssigntoThisBatch
-            };
-            return PartialView(model);
-        }
-        [HttpPost]
-        public IActionResult Assign(string batchId, string[] employeeIds)
-        {
-            if (!ModelState.IsValid)
-                return RedirectToAction("Details", "Batch", new { batchId, error = "not valid!" });
+            var employeesNotAssignedToThisBatch = GetNotAssignEmployeesToBatch(batchId);
 
-            foreach (var employeeId in employeeIds)
+            var model = new AssignEmployeesViewModel
+            {
+                BatchId = batchId,
+                Employees = employeesNotAssignedToThisBatch.Take(5).ToList(),
+                TotalCount = employeesNotAssignedToThisBatch.Count()
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Filter(string batchId, int page = 1, int pageSize = 5, string searchTerm = "")
+        {
+            // Your logic to filter and paginate the data
+            var filteredEmployees = GetNotAssignEmployeesToBatch(batchId);
+
+            // Apply search filter if a search term is provided
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower(); // Convert to lowercase for case-insensitive comparison
+
+                filteredEmployees = filteredEmployees
+                    .Where(employee =>
+                        employee.Name.ToLower().Contains(searchTerm) ||
+                        employee.Email.ToLower().Contains(searchTerm) ||
+                        employee.Department.Name.ToLower().Contains(searchTerm))
+                    .ToList();
+            }
+
+            var model = new AssignEmployeesViewModel
+            {
+                Employees = filteredEmployees.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
+                PageNumber = page,
+                PageSize = pageSize,  // Make sure to include PageSize in the model
+                TotalCount = filteredEmployees.Count()
+            };
+
+            // Return JSON data
+            return Json(model);
+        }
+
+        [HttpPost]
+        public IActionResult Assign(string batchId, string selectedEmployeeIds)
+        {
+            // Split the comma-separated string into a list of strings
+            List<string> selectedIdsList = selectedEmployeeIds.Split(',').ToList();
+
+            foreach (var selectedEmployeeId in selectedIdsList)
             {
                 var batchEmployee = new BatchEmployees
                 {
                     BatchId = batchId,
-                    EmployeeId = employeeId
+                    EmployeeId = selectedEmployeeId
                 };
                 _context.BatchEmployees.Add(batchEmployee);
             }
             _context.SaveChanges();
-
-            return RedirectToAction("Details", "Batch", new { batchId, success = "Employees Assigned" });
+            // Redirect to a new page after successful assignment
+            return RedirectToAction("Details", "Batch", new { batchId });
         }
 
         public IActionResult Unassgin(string employeeId, string batchId)
@@ -96,6 +129,15 @@ namespace Train.Controllers
             };
 
             return PartialView("_EmployeeTablePartial", model);
+        }
+        // Your helper method to filter employees based on batchId and selectedEmployeeIds
+        private List<ApplicationUser> GetNotAssignEmployeesToBatch(string batchId)
+        {
+            var batchEmployees = _context.BatchEmployees.Where(b => b.BatchId == batchId).Select(be => be.Employee).ToList();
+            var employeesNotAssignedToThisBatch = _context.Users.Include(user => user.Department)
+                .Where(user => !batchEmployees.Contains(user)).ToList();
+           
+            return employeesNotAssignedToThisBatch;
         }
     }
 }
