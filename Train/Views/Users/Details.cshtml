@@ -1,7 +1,23 @@
-﻿@model ApplicationUser
+﻿@model UserRolesViewModel
 <style>
-    tr {
-        border-bottom: none;
+    .table th, .table td {
+        border-top: none;
+    }
+    .role-form {
+        display: inline-block;
+        margin-right: 10px; /* Add some margin between the buttons */
+    }
+
+    .search-dropmenu {
+        position: relative;
+        display: block;
+    }
+
+    .add-btn {
+        position: absolute;
+        right: -0.3rem;
+        top: 0.05rem;
+        margin: 0;
     }
 </style>
 <div class="card">
@@ -16,7 +32,7 @@
                             @Model.Name
                         </td>
                         <th>
-                            <a href="" class="btn btn-primary" onclick="onChangeName();">Change</a>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#nameModal">Change</button>
                         </th>
                     </tr>
                 <tr scope="row">
@@ -27,7 +43,7 @@
                         @Model.Email
                     </td>
                     <th>
-                        <a href="" class="btn btn-primary" onclick="onChangeEmail();">Change</a>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#emailModal">Change</button>
                     </th>
                 </tr>
                 <tr scope="row">
@@ -38,7 +54,7 @@
                         @Model.Department.Name
                     </td>
                     <th>
-                        <a href="" class="btn btn-primary" onclick="onChangeDeparment();">Change</a>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#deparmentModal">Change</button>
                     </th>
                 </tr>
                 </tbody>
@@ -48,15 +64,110 @@
                 Roles
             </div>
             <div class="card-body">
-                @* <h5 class="card-title">Special title treatment</h5> *@
-                <a href="#" class="btn btn-primary">User</a>
-                <a href="#" class="btn btn-outline-primary">Manager</a>
+                <form id="userRoleForm" class="role-form" action="/Roles/ChangeUserRoleUser" method="post">
+                    <input type="hidden" name="userId" value="@Model.Id" />
+                    <input type="hidden" name="role" value="User" />
+                    <input type="hidden" name="isUserInRole" value="@Model.Roles.Contains("User").ToString().ToLower()" />
+                    <button type="submit" class="btn @(Model.Roles.Contains("User") ? "btn-primary" : "btn-outline-primary")">User</button>
+                </form>
+
+                <form id="managerRoleForm" class="role-form" action="/Roles/ChangeUserRoleManager" method="post">
+                    <input type="hidden" name="userId" value="@Model.Id" />
+                    <input type="hidden" name="role" value="Manager" />
+                    <input type="hidden" name="isUserInRole" value="@Model.Roles.Contains("Manager").ToString().ToLower()" />
+                    <button type="submit" class="btn @(Model.Roles.Contains("Manager") ? "btn-primary" : "btn-outline-primary")">Manager</button>
+                </form>
             </div>
         </div>
             </div>
 </div>
 
 <!-- Bootstrap Models -->
+<!-- Modal for entering new user name -->
+<div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="nameModalLabel">Change Name</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="userNameForm" action="/Users/ChangeName" method="post">
+                    <div class="form-group">
+                        <label for="name">User Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" required value="@Model.Name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Models -->
+<!-- Modal for entering new email name -->
+<div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emailModalLabel">Change Email</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="emailForm" action="/Users/ChangeEmail" method="post">
+
+                    <!-- Hidden input for Model.Id -->
+                    <input type="hidden" name="userId" value="@Model.Id" />
+
+                    <div class="form-group">
+                        <label for="newEmail">User Email:</label>
+                        <input type="text" class="form-control" id="newEmail" name="newEmail" required value="@Model.Email">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for entering new department name -->
+<div class="modal fade" id="deparmentModal" tabindex="-1" role="dialog" aria-labelledby="deparmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deparmentModalLabel">Change Department</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="departmentForm" action="/Users/ChangeDepartment" method="post">
+                    <!-- Hidden input for Model.Id -->
+                    <input type="hidden" name="userId" value="@Model.Id" />
+                    <div class="form-group">
+                        <label for="DepartmentId" class="form-control-label">Deparment</label>
+                        <div class="search-dropmenu">
+                            <input type="text" class="form-control" placeholder="Search" id="search-input">
+                            <input for="DepartmentId" name="selectedValue" type="hidden" id="selected-value" />
+                            <button type="button" class="btn btn-primary add-btn">Add</button>
+                            <div id="dropdown" class="dropdown-menu">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Edit User Model -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" data-url='@Url.Action("Edit")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -71,6 +182,7 @@
         </div>
     </div>
 </div>
+
 <!-- Manage Role Model -->
 <div class="modal fade" id="manageRolesModal" tabindex="-1" role="dialog" data-url='@Url.Action("ManageRoles","Roles")'>
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -85,6 +197,7 @@
         </div>
     </div>
 </div>
+
 @section Breadcrumbs{
     <div class="col-lg-6 col-7">
         <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
@@ -103,52 +216,111 @@
         </nav>
     </div>
 }
-    @section Scripts {
+@section Scripts {
     <script>
         $(document).ready(function () {
-            function handleEditLinkClick() {
-                var url = $("#editModal").data('url');
-                var userId = $(this).data("id");
-                // Make an AJAX request to load the employee data
-                $.ajax({
-                    type: "GET",
-                    url: url, // Replace with your actual action method
-                    data: { userId: userId },
-                    success: function (view) {
-                        $("#editModal .modal-body").html(view);
-                        $("#editModal").modal("show");
-                        $.validator.unobtrusive.parse($("#editForm"));
-                    },
-                    error: function () {
-                        console.error("Error loading user data");
-                    }
+            var searchInput, selectedValueInput, addBtn, dropdown, filteredOptions, options;
+            initializeVariables();
+
+             // Fetch options from the server on page load
+            fetchOptionsFromServer().then(function (fetchedOptions) {
+                // Update the options array
+                options = fetchedOptions;
+            });
+
+            // Event Handlers
+            searchInput.on('input focus', showOptions);
+            searchInput.on('blur', function () {
+                setTimeout(() => dropdown.hide(), 200);
+            });
+            $(".add-btn").on("click", handleAddButtonClick);
+
+            function initializeVariables() {
+                searchInput = $('#search-input');
+                selectedValueInput = $('#selected-value');
+                addBtn = $('.add-btn');
+                dropdown = $('#dropdown');
+                filteredOptions = [];
+            }
+
+            function fetchOptionsFromServer() {
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        type: "GET",
+                        url: '/Department/GetDepartments',
+                        dataType: 'json',
+                        success: function (data) {
+                            resolve(data || []);
+                        },
+                        error: function (error) {
+                            console.error('Error fetching options from the server:', error);
+                            reject(error);
+                        }
+                    });
                 });
             }
-            function handleMangeRolesLinkClick() {
-                var url = $("#manageRolesModal").data('url');
-                var userId = $(this).data("id");
-                // Make an AJAX request to load the employee data
-                $.ajax({
-                    type: "GET",
-                    url: url, // Replace with your actual action method
-                    data: { userId: userId },
-                    success: function (view) {
-                        $("#editModal .modal-body").html(view);
-                        $("#editModal").modal("show");
-                        $.validator.unobtrusive.parse($("#editForm"));
-                    },
-                    error: function () {
-                        console.error("Error loading user data");
-                    }
+
+            function showOptions() {
+                filterOptions();
+                dropdown.empty();
+                if (filteredOptions.length > 0) {
+                    $.each(filteredOptions, function (index, option) {
+                        var optionItem = $('<div class="dropdown-item"></div>')
+                            .text(option.text)
+                            .on('click', function () {
+                                searchInput.val(option.text);
+                                selectedValueInput.val(option.value);
+                                dropdown.hide();
+                            });
+
+                        dropdown.append(optionItem);
+                    });
+
+                    dropdown.show().css({ overflowY: 'auto', maxHeight: '200px' });
+                } else {
+                    dropdown.hide();
+                }
+            }
+
+            function filterOptions() {
+                var filter = searchInput.val().toUpperCase();
+                filteredOptions = options.filter(function (option) {
+                    return option.text.toUpperCase().includes(filter);
                 });
             }
-            // Event handlers
-            // Edit handler
-            $(".edit-link").on("click", handleEditLinkClick);
 
-            // Manage roles handler
-            $(".manageRoles-link").on("click", handleMangeRolesLinkClick);
-
+            function handleAddButtonClick() {
+                var newItemText = searchInput.val().trim();
+                if (newItemText) {
+                    $.ajax({
+                        url: '/Department/Create',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(newItemText),
+                        success: function (data) {
+                            options.push(data);
+                            showOptions();
+                        },
+                        error: function (error) {
+                            console.error('Error adding item to the server:', error);
+                        }
+                    });
+                }
+            }
         });
+     
+        function onChangeUserRole() {
+            $('#userRoleForm #userId').val('@Model.Id');
+            $('#userRoleForm #role').val('User');
+            $('#userRoleForm #isUserInRole').val('@Model.Roles.Contains("User").ToString().ToLower()');
+            $('#userRoleForm').submit();
+        }
+
+        function onChangeManagerRole() {
+            $('#managerRoleForm #managerUserId').val('@Model.Id');
+            $('#managerRoleForm #managerRole').val('Manager');
+            $('#managerRoleForm #isManagerInRole').val('@Model.Roles.Contains("Manager").ToString().ToLower()');
+            $('#managerRoleForm').submit();
+        }
     </script>
 }

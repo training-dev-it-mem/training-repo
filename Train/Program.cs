@@ -122,7 +122,6 @@ using (var scope = app.Services.CreateScope())
 
     await SeedRolesAsync(roleManager, "User");
     await SeedRolesAsync(roleManager, "Manager");
-    await SeedRolesAsync(roleManager, "Employee");
 
     var adminUser = await userManager.FindByNameAsync("admin");
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Train.Models.Identity;
 
 namespace Train.Areas.Identity.Pages.Account.Manage
@@ -40,14 +41,17 @@ namespace Train.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Confirm new password")]
             [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            [Required]
+            [Display(Name = "Token")]
+            public string Token { get; set; }
         }
 
 
-        public async Task<IActionResult> OnGetAsync(string userId, string token)
+        public async Task<IActionResult> OnGetAsync(string userId, string code)
         {
             // Validate the token and user ID
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null || !await _userManager.VerifyUserTokenAsync(user, TokenOptions.DefaultProvider, UserManager<ApplicationUser>.ResetPasswordTokenPurpose, token))
+            if (user == null || !await _userManager.VerifyUserTokenAsync(user, TokenOptions.DefaultProvider, UserManager<ApplicationUser>.ResetPasswordTokenPurpose, code))
             {
                 // Invalid token or user ID, redirect to login
                 return RedirectToPage("./Login");
@@ -65,11 +69,20 @@ namespace Train.Areas.Identity.Pages.Account.Manage
                 return RedirectToPage("./ChangePassword");
             }
 
+            // Initialize Input if it is null
+            if (Input == null)
+            {
+                Input = new InputModel();
+            }
+
+            // Set the token in Input
+            Input.Token = code;
+
             // User doesn't have a password, allow setting the password
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string userId, string token)
+        public async Task<IActionResult> OnPostAsync(string userId)
         {
             if (!ModelState.IsValid)
             {
@@ -78,7 +91,7 @@ namespace Train.Areas.Identity.Pages.Account.Manage
 
             // Validate the token and user ID again
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null || !await _userManager.VerifyUserTokenAsync(user, TokenOptions.DefaultProvider, UserManager<ApplicationUser>.ResetPasswordTokenPurpose, token))
+            if (user == null || !await _userManager.VerifyUserTokenAsync(user, TokenOptions.DefaultProvider, UserManager<ApplicationUser>.ResetPasswordTokenPurpose, Input.Token))
             {
                 // Invalid token or user ID, redirect to login
                 return RedirectToPage("./Login");

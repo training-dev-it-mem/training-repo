@@ -142,7 +142,7 @@ namespace Train.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(string userId)
+        public async Task<IActionResult> Details(string userId)
         {
             if (HttpContext.Request.Query.TryGetValue("success", out var successValue))
             {
@@ -161,8 +161,24 @@ namespace Train.Controllers
                 ViewBag.ErrorMessage = error;
             }
             var user = _context.Users.Include(u=>u.Department).Where(u=>u.Id == userId ).FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound(); // or handle the case when the user is not found
+            }
 
-            return View(user);
+            // Get the user roles
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var model = new UserRolesViewModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Department = user.Department,
+                Roles = roles.ToList()
+            };
+           
+            return View(model);
         }
 
         [HttpGet]
@@ -308,6 +324,90 @@ namespace Train.Controllers
             return PartialView("_UserTablePartial", model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ChangeEmail(string userId, string newEmail)
+        {
+            // 1. Ensure User is Authenticated
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login"); // Redirect to login if not authenticated
+            }
+
+            // 2. Update Email in UserManager
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(); // User not found
+            }
+
+            // 3. Handle Unique Email
+            var existingUser = await _userManager.FindByEmailAsync(newEmail);
+            if (existingUser != null && existingUser.Id != user.Id)
+            {
+                return RedirectToAction("Details", new { userId, error= "Email is already in use." });
+            }
+
+            // Update the email address
+            user.Email = newEmail;
+            user.NormalizedEmail = newEmail.ToUpperInvariant();
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                // Handle error, e.g., ModelState.AddModelError
+                return RedirectToAction("Details", new { userId, error = "Email not change." });
+            }
+
+            // 4. Send Email Confirmation (Optional)
+            // You can implement email confirmation logic here if needed
+            return RedirectToAction("Details", new { userId, success="Email has been changed." });
+        }
+
+        [HttpPost]
+        public IActionResult ChangeDepartment(string userId, string selectedValue)
+        {
+            // Validate input parameters
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(selectedValue))
+            {
+                // Handle invalid input, for example, return a BadRequest result
+                return BadRequest("Invalid input parameters");
+            }
+
+            // Retrieve the user by userId
+            var user = _userManager.FindByIdAsync(userId).Result;
+            if (user == null)
+            {
+                // Handle user not found, for example, return a NotFound result
+                return NotFound($"User with ID {userId} not found");
+            }
+
+
+            // Retrieve the department by departmentId
+            var department = _context.Departments.Find(selectedValue);
+            if (department == null)
+            {
+                // Handle department not found, for example, return a NotFound result
+                return RedirectToAction("Details", new { userId, error = $"Department with ID {selectedValue} not found" });
+            }
+
+            // Update the user's department
+            user.Department = department;
+
+            // Save changes to the database
+            var result = _userManager.UpdateAsync(user).Result;
+
+            if (result.Succeeded)
+            {
+                // Handle successful update, for example, return a success message
+                return RedirectToAction("Details", new { userId, success = "Department updated successfully." });
+            }
+            else
+            {
+                // Handle update failure, for example, return an error message
+                return RedirectToAction("Details", new { userId, error = "Failed to update department" });
+            }
+        }
+
         private string GenerateConfirmationEmail(string callbackUrl)
         {
             return $@"
@@ -379,4 +479,3 @@ namespace Train.Controllers
         }
     }
 }
-
